@@ -1,0 +1,10 @@
+out
+var
+.svn
+.DS_Store
+*.DS_Store
+node_modules
+config.js
+.dev_cfg.js
+package-lock.json
+nohup.out
