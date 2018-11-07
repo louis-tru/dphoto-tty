@@ -10,6 +10,13 @@ var { ViewController } = require('ngui-utils/ctr');
 /**
  * @class API
  */
-module.exports = utils.class('API', ViewController, {
-	// TODO ...
-});
+module.exports = class extends ViewController {
+
+	/**
+	 * @func getSessionList()
+	 */
+	async getSessionList({ deviceId }) {
+		return session.getSessionList(deviceId);
+	}
+
+};

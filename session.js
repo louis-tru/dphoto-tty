@@ -6,133 +6,71 @@
 var utils = require('ngui-utils');
 var server = require('ngui-utils/server');
 var { ClientService } = require('ngui-utils/cli_service');
-var { users } = users.config.users || {};
+var { users } = utils.config.users || {};
 var crypto = require('crypto');
 
-var all_devices = {
+var all_device_session = {
 	/**
-	'deviceId_0': {
-		'session_id_0': { ttyd, tty },
-		'session_id_1': { ttyd, tty }
+	['deviceId_0']: {
+		['session_id_0']: { ttyd, tty },
+		['session_id_1']: { ttyd, tty }
 	}
 	 */
 };
 
-function set_status(self, status) {
-	// TODO ..
-}
-
 /**
  * @class Session
  */
-var Session = ustew.class('Session', ClientService, {
+class Session {
+	get id() { return this.m_id }
+	get device() { return this.m_device }
+	get tty() { return this.m_tty }
+	get ttyd() { return this.m_ttyd }
+	set ttyd(value) { this.m_ttyd = value }
+	constructor(device, tty) {
+		this.m_id = utils.id;
+		this.m_device = device;
+		this.m_tty = tty;
+		this.m_ttyd = null;
+	}
+}
 
-	m_login: false,
+/**
+ * @class Basic
+ */
+var Basic = utils.class('Basic', ClientService, {
+
 	m_message: null,
 	m_recipient: null, // conv
-	m_has_ttyd: false,
 	m_session_id: 0,
 	m_device_id: 0,
-	m_status: 0,
-	
+	m_session: null,
+
+	m_open: function() {},
+	m_close: function() {},
+
 	// @public:
 	onMessage: null,
-	onExit: null,
-	onStatus: null,
 
 	get recipient() { return this.m_recipient },
-	get session() { return this.m_session_id },
+	get sessionId() { return this.m_session_id },
 	get deviceId() { return this.m_device_id },
-	get hasTTYd() { return this.m_has_ttyd },
-	get status() { return this.m_status },
-
+	
 	/**
 	 * @constructor
 	 */
-	constructor: funciton(conv) {
+	constructor: function(conv) {
 		ClientService.call(this, conv);
-
 		this.m_message = [];
-		this.m_has_ttyd = !!this.params.ttyd;
-		this.m_session_id = this.params.session;
 		this.m_device_id = this.params.device_id;
-
-		conv.addEventListener('Open', e=>{
-			var device = all_devices[this.deviceId];
-			var convs = device[this.session] || {};
-
-			if (this.hasTTYd) { // ttyd
-				if (convs.ttyd) { // close old
-					convs.ttyd.close();
-				}
-				convs.ttyd = conv;
-
-				if (convs.tty) {
-					if (convs.tty.clientServices.session) {
-						convs.tty.clientServices.session.m_recipient = this;
-						this.m_recipient = convs.tty.clientServices.session;
-						ready(this);
-						ready(this.m_recipient);
-					} else {
-						convs.tty.close();
-						conv.close();
-					}
-				}
-			} else {
-				if (convs.ttyd) {
-					// TODO ...
-				}
-			}
-
-			device[this.session] = convs;
-		});
-
-		conv.addEventListener('Close', e=>{
-			var device = all_devices[this.deviceId];
-			if (device) {
-				var convs = device[this.session];
-				if (convs) {
-
-				}
-			}
-		});
-
+		conv.addEventListener('Open', e=>this.m_open());
+		conv.addEventListener('Close', e=>this.m_close());
 	},
 
-	/**
-	 * @func auth()
-	 */
-	auth: function() {
-		if (this.deviceId && this.session) {
-			if (!device[this.session]) {
-				all_devices[this.deviceId] = {};
-			}
-			var { user, passwd } = this.params;
-			var md5 = crypto.createHash('md5');
-			md5.update(passwd);
-			hash = md5.digest('hex');
-			return md5.digest('hex') == users[user];
-		} else {
-			return false;
-		}
-	},
-
-	/**
-	 * @func exit()
-	 */
-	exit: async funciton({ code = 0 }) {
-		// TODO ...
-		// clear session
-		if (this.m_recipient) {
-			this.m_recipient.trigger('Exit', code);
-		}
-		this.conv.close();
-	},
-	
 	/**
 	 * @func sendMessage()
 	 */
-	sendMessage: async funciton({ data, type = 'stdout' }) {
+	sendMessage: async function({ data, type = '' }) {
 		if (this.m_recipient) {
 			this.m_recipient.trigger('Message', { type, data });
 		} else {
@@ -140,42 +78,192 @@ var Session = ustew.class('Session', ClientService, {
 		}
 	},
 
-}
-
-/**
- * @class DTTYServer
- */
-var DTTYClient = ustew.class('DTTYClient', ClientService, {
-
-});
-
-/**
- * @class DTTYServer
- */
-var DTTYServer = ustew.class('DTTYServer', ClientService, {
-
-	// @public:
-	onConnectRequest: null,
-	onMessage: null,
-	onExit: null,
-	
 	/**
-	 * @func auth()
+	 * @func getSessionId()
 	 */
-	auth: function() {
-		if (this.deviceId && this.sessionId) {
-			if (all_devices[this.deviceId]) {
-				var { ttyd, tty } = all_devices[this.deviceId][this.sessionId];
-				
-			}
-			return true;
-		}
-		return false;
+	getSessionId: async function() {
+		return this.m_session_id;
 	},
 
 });
 
+/**
+ * @class DTTYServer
+ */
+var DTTYClient = utils.class('DTTYClient', Basic, {
+
+	m_status: 0,
+
+	/**
+	 *@event ConnectRequest
+	 */
+	onExit: null,
+	onStatus: null,
+
+	/**
+	 * @get status
+	 */
+	get status() { return this.m_status },
+
+	/**
+	 * @set status
+	 */
+	set status(value) {
+		if (value != this.m_status) {
+			this.m_status = value;
+			if (value) {
+				utils.assert(this.m_recipient);
+				var message = this.m_message;
+				this.m_message = [];
+				message.forEach(e=>this.m_recipient.trigger('Message', e));
+			}
+			this.trigger('Status', value);
+		}
+	},
+
+	// @overwrite
+	m_open: function() {
+		utils.assert(!this.m_session.tty);
+		for (var [k,session] of Object.entries(this.m_session.device)) {
+			if (session.ttyd) {
+				// 通知有新的连接进入
+				session.ttyd.trigger('ConnectRequest', this.sessionId);
+				break;
+			}
+		}
+	},
+
+	// @overwrite
+	m_close: function() {
+		utils.assert(this.m_session.tty);
+		this.m_session.tty = null;
+		if (this.m_recipient) {
+			this.m_recipient.m_recipient = null;
+			this.m_recipient.close();
+			this.m_recipient = null;
+		}
+		delete all_device_session[this.deviceId][this.sessionId];
+	},
+
+	/**
+	 * @func auth()
+	 */
+	auth: function() {
+		if (this.deviceId) {
+			var device = all_device_session[this.deviceId];
+			if (!device) {
+				all_device_session[this.deviceId] = device = {};
+			}
+			var { user, passwd } = this.params;
+			var md5 = crypto.createHash('md5');
+			md5.update(passwd);
+			hash = md5.digest('hex');
+			if (md5.digest('hex') == users[user]) {
+				var session = new Session(device, this);
+				device[session.id] = session; // add session
+				this.m_session_id = session.id;
+				this.m_session = session;
+				return true;
+			}
+		} else {
+			return false;
+		}
+	},
+
+	/** 
+	 *@get status
+	 */
+	getStatus: async function() {
+		return this.m_status;
+	},
+
+});
+
+/**
+ * @class DTTYServer
+ */
+var DTTYServer = utils.class('DTTYServer', Basic, {
+
+	/**
+	 *@event onConnectRequest
+	 */
+	onConnectRequest: null,
+
+	// @overwrite
+	m_open: function() {
+		utils.assert(!this.m_session.ttyd);
+		this.m_session.ttyd = this;
+		this.m_recipient = this.m_session.tty;
+		this.m_recipient.m_recipient = this;
+		this.m_recipient.status = 1;
+	},
+
+	// @overwrite
+	m_close: function() {
+		utils.assert(this.m_session.ttyd);
+		this.m_session.ttyd = null;
+		if (this.m_recipient) {
+			this.m_recipient.m_recipient = null;
+			this.m_recipient.status = 0;
+			this.m_recipient = null;
+		}
+	},
+
+	/**
+	 * @func auth()
+	 */
+	auth: function() {
+		if (this.deviceId && this.params.session) {
+			if (all_device_session[this.deviceId]) {
+				var session = all_device_session[this.deviceId][this.params.session];
+				if (session && !session.ttyd) {
+					this.m_session = session;
+					this.m_session_id = session.id;
+					return true;
+				}
+			}
+		}
+		return false;
+	},
+
+	/**
+	 * @func exit()
+	 */
+	exit: async function({ code = 0 }) {
+		if (this.m_recipient) {
+			this.m_recipient.trigger('Exit', code);
+			this.m_recipient.conv.close();
+		}
+		this.conv.close();
+	},
+
+});
+
+/**
+ * @func getSessionList(deviceId)
+ */
+function getSessionList(deviceId) {
+	utils.assert(deviceId);
+	return Object.keys(all_device_session[deviceId] || {});
+}
+
+/**
+ * @func closeSession(deviceId)
+ */
+function closeSession(deviceId, sessionId) {
+	var device = all_device_session[deviceId];
+	if (device) {
+		var session = device[sessionId];
+		if (session) {
+			utils.assert(session.tty);
+			session.tty.close();
+		}
+	}
+}
+
 module.exports = {
 	DTTYClient,
 	DTTYServer,
+	getSessionList,
+	closeSession,
 };

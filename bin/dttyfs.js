@@ -3,4 +3,4 @@
  * @date 2018-11-05
  */
 
-var arguments = require('ngui-utils/arguments');
+require('../forward-server');

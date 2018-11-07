@@ -1,13 +1,13 @@
 {
 	"name": "dphoto-tty",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"main": "main-tty.js",
 	"bin": {
-		"dttyd": "bin/dttys.js",
-		"dtty": "bin/dttyc.js",
+		"dttyd": "bin/dttyd.js",
+		"dtty": "bin/dtty.js",
 		"dttyfs": "bin/dttyfs.js"
 	},
 	"dependencies": {
-		"ngui-utils": "^0.5.64"
+		"ngui-utils": "^0.5.66"
 	}
 }

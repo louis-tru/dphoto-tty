@@ -15,8 +15,8 @@ var api = require('./api');
 fs.mkdir_p_sync(`${paths.var}/temp`);
 fs.writeFileSync(`${paths.var}/temp/pid`, process.pid);
 
-service.set('session', session.Session);
-service.set('connect', session.Connect);
+service.set('tty', session.DTTYClient);
+service.set('ttyd', session.DTTYServer);
 service.set('api', api);
 
 server.setShared(new server.Server({

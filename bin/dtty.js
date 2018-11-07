@@ -4,3 +4,6 @@
  */
 
 var arguments = require('ngui-utils/arguments');
+var { TTYClient } = require('../client');
+
+new TTYClient().start({ deviceId: 1 });
