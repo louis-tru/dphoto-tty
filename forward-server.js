@@ -4,6 +4,7 @@
  */
 
 var utils = require('ngui-utils');
+var fs = require('ngui-utils/fs');
 var log = require('./log');
 var server = require('ngui-utils/server');
 var service = require('ngui-utils/service');

@@ -6,4 +6,4 @@
 var arguments = require('ngui-utils/arguments');
 var { TTYServer } = require('../server');
 
-new TTYServer().start({ deviceId: 1 });
+new TTYServer({ deviceId: 1 }).start();

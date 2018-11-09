@@ -9,6 +9,7 @@ var child_process = require('child_process');
 var { WSConversation, Client } = require('ngui-utils/cli');
 var { Monitor } = require('ngui-utils/monitor');
 var { Request } = require('ngui-utils/request');
+var pty = require('pty.js');
 
 /**
  * @class Session
@@ -20,7 +21,7 @@ class Session {
 		this.m_ttyd = ttyd;
 		this.m_session_id = session_id;
 		this.m_device_id = ttyd.m_device_id;
-		this.m_child_process = null;
+		this.m_term = null;
 		this.m_activity = true; // 是否活着
 
 		ttyd.m_sessions[session_id] = this;
@@ -44,43 +45,37 @@ class Session {
 	}
 
 	m_open() {
-		if (this.m_child_process) {
+		if (this.m_term) {
 			return;
 		}
 
 		// create child process
-		var ch = child_process.spawn('sh');
-
-		ch.on('error', function(err) {
-			// 
+		var term = pty.spawn('bash', [], {
+			name: 'xterm-color',
+			cols: 80,
+			rows: 30,
+			cwd: process.env.HOME,
+			env: process.env,
 		});
 
-		ch.stdout.on('data', function(e) {
+		term.on('data', function(e) {
 			if (this.m_activity) {
 				var data = { 
-					data: e.toString('utf8'), type: 'stdout',
+					data: e.toString('utf8'),
+					type: '',
 				};
 				this.m_cli.call('sendMessage', data).catch(console.error);
 			}
 		});
 
-		ch.stderr.on('error', function(e) {
-			if (this.m_activity) {
-				var data = { 
-					data: e.toString('utf8'), type: 'stderr',
-				};
-				this.m_cli.call('sendMessage', data).catch(console.error);
-			}
-		});
-
-		ch.on('exit', function(code) {
+		term.on('exit', function(code) {
 			if (this.m_activity) {
 				this.m_activity = false;
 				this.m_cli.call('exit', { code }).catch(console.error);
 			}
 		});
 
-		this.m_child_process = ch;
+		this.m_term = term;
 	}
 
 	async m_close() {
@@ -97,18 +92,18 @@ class Session {
 			this.m_activity = false;
 		}
 
-		while (!this.m_child_process.killed) {
-			this.m_child_process.kill(); // kill 
-			await utils.sleep(500);
+		while (this.m_term.writable) {
+			this.m_term.kill(); // kill 
+			await utils.sleep(200);
 		}
 
-		this.m_child_process = null;
+		this.m_term = null;
 		delete this.m_ttyd.m_sessions[this.m_session_id];
 	}
 
 	m_message(data) {
 		if (this.m_activity) {
-			// this.m_child_process.stdin.write();
+			this.m_term.write(data);
 		}
 	}
 
@@ -124,37 +119,33 @@ class Session {
  */
 class TTYServer {
 
-	constructor() {
-		this.m_monitor = null;
-		this.m_sessions = {};
-		this.m_req = null;
-		this.m_hostname = '127.0.0.1';
-		this.m_port = 8095;
-		this.m_ssl = false;
-		this.m_device_id = '';
-	}
-
-	/**
-	 * @func start()
-	 */
-	start({
+	constructor({
 		host = '127.0.0.1',
 		port = 8095,
 		ssl = false,
 		deviceId = '',
 	}) {
-		utils.assert(!this.m_monitor);
 		utils.assert(deviceId);
+		this.m_monitor = null;
+		this.m_sessions = {};
 		this.m_hostname = host;
 		this.m_port = port;
 		this.m_ssl = ssl;
 		this.m_device_id = deviceId;
 		this.m_req = new Request(`${ssl ? 'https': 'http'}://${host}:${port}/service-api`);
+	}
+
+	/**
+	 * @func start()
+	 */
+	start() {
+		utils.assert(!this.m_monitor);
 		this.m_monitor = new Monitor(30* 1000, -1);
 		this.m_monitor.start(async e=>{
 			try {
-				var r = await this.m_req.get('getSessionList', { deviceId });
-				r.forEach(e=>{
+				(await this.m_req.get('getSessionList', 
+					{ deviceId: this.m_device_id })
+				).forEach(e=>{
 					if (!this.m_sessions[e]) {
 						new Session(this, e);
 					}
