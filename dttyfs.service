@@ -5,7 +5,7 @@ Wants=network-online.target
 [Service]
 User=root
 
-ExecStart=dttyfs
+ExecStart=/usr/local/bin/dttyfs
 Restart=always
 RestartSec=3
 
