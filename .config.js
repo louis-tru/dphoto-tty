@@ -7,7 +7,9 @@ module.exports = {
 	users: {
 		admin: '42f390026b5ed41b5a45a297c3d42e3d',
 	},
-	host: '127.0.0.1',
-	port: 8095,
-	device_id: 'test',
+	dttyd: {
+		host: 'www.dphotos.com.cn',
+		port: 8095,
+		device_id: 'test',
+	},
 };

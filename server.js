@@ -158,7 +158,7 @@ class TTYServer {
 					}
 				});
 			} catch(err) {
-				console.error(err);
+				console.error(err.message);
 			}
 		}).catch(console.error);
 	}

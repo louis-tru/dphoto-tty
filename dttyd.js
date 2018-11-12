@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * @copyright © 2018 Copyright dphone.com
  * @date 2018-11-05
@@ -7,7 +8,7 @@ var utils = require('ngui-utils');
 var arguments = require('ngui-utils/arguments');
 var { exec, execSync } = require('ngui-utils/syscall');
 var { TTYServer } = require('./server');
-var { host = '127.0.0.1', port = 8095, device_id } = utils.config;
+var { host = '127.0.0.1', port = 8095, device_id } = utils.config.dttyd || {};
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;
