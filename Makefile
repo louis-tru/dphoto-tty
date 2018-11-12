@@ -19,7 +19,9 @@ install:
 install_dttyfs: install
 	cp dttyfs.service /lib/systemd/system
 	systemctl enable dttyfs
+	systemctl daemon-reload
 
 install_dttyd: install
 	cp dttyd.service /lib/systemd/system
 	systemctl enable dttyd
+	systemctl daemon-reload
