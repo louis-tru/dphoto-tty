@@ -18,8 +18,8 @@ install:
 
 install_dttyfs: install
 	cp dttyfs.service /lib/systemd/system
-	systectl enable dttyfs
+	systemctl enable dttyfs
 
 install_dttyd: install
 	cp dttyd.service /lib/systemd/system
-	systectl enable dttyd
+	systemctl enable dttyd
