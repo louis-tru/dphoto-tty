@@ -4,5 +4,5 @@
  */
 
 module.exports = {
-	admin: '123456',
+	admin: '42f390026b5ed41b5a45a297c3d42e3d',
 };

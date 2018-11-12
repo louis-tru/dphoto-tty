@@ -56,7 +56,6 @@ var Basic = utils.class('Basic', ClientService, {
 	m_close: function() {},
 
 	// @public:
-	onMessage: null,
 
 	get recipient() { return this.m_recipient },
 	get sessionId() { return this.m_session_id },
@@ -69,18 +68,18 @@ var Basic = utils.class('Basic', ClientService, {
 		ClientService.call(this, conv);
 		this.m_message = [];
 		this.m_device_id = this.params.device_id;
-		conv.addEventListener('Open', e=>this.m_open());
-		conv.addEventListener('Close', e=>this.m_close());
+		conv.onOpen.on(e=>this.m_open());
+		conv.onClose.on(e=>this.m_close());
+		conv.onMessage.on(e=>this.m_send_data(e.data));
 	},
 
-	/**
-	 * @func sendMessage()
-	 */
-	sendMessage: async function({ data, type = '' }) {
-		if (this.m_recipient) {
-			this.m_recipient.trigger('Message', { type, data });
-		} else {
-			this.m_message.push({ type, data });
+	m_send_data: function({ type, data }) {
+		if (type == 1) {
+			if (this.m_recipient) {
+				this.m_recipient.conv.send(data);
+			} else {
+				this.m_message.push(data);
+			}
 		}
 	},
 
@@ -99,6 +98,8 @@ var Basic = utils.class('Basic', ClientService, {
 var DTTYClient = utils.class('DTTYClient', Basic, {
 
 	m_status: 0,
+	m_cols: 80,
+	m_rows: 30,
 
 	/**
 	 *@event ConnectRequest
@@ -121,7 +122,7 @@ var DTTYClient = utils.class('DTTYClient', Basic, {
 				utils.assert(this.m_recipient);
 				var message = this.m_message;
 				this.m_message = [];
-				message.forEach(e=>this.m_recipient.trigger('Message', e));
+				message.forEach(e=>this.m_send_data(e));
 			}
 			this.trigger('Status', value);
 		}
@@ -129,7 +130,7 @@ var DTTYClient = utils.class('DTTYClient', Basic, {
 
 	// @overwrite
 	m_open: function() {
-		utils.assert(!this.m_session.tty);
+		utils.assert(this.m_session.tty);
 		for (var [k,session] of Object.entries(this.m_session.device)) {
 			if (session.ttyd) {
 				// 通知有新的连接进入
@@ -145,42 +146,58 @@ var DTTYClient = utils.class('DTTYClient', Basic, {
 		this.m_session.tty = null;
 		if (this.m_recipient) {
 			this.m_recipient.m_recipient = null;
-			this.m_recipient.close();
+			this.m_recipient.conv.close();
 			this.m_recipient = null;
 		}
 		delete all_device_session[this.deviceId][this.sessionId];
 	},
 
 	/**
-	 * @func auth()
+	 * @func requestAuth()
 	 */
-	auth: function() {
+	requestAuth: async function() {
 		if (this.deviceId) {
 			var device = all_device_session[this.deviceId];
 			if (!device) {
 				all_device_session[this.deviceId] = device = {};
 			}
-			var { user, passwd } = this.params;
-			var md5 = crypto.createHash('md5');
-			md5.update(passwd);
-			hash = md5.digest('hex');
-			if (md5.digest('hex') == users[user]) {
+			var { user, passwd, cols, rows, } = this.params;
+			// var md5 = crypto.createHash('md5');
+			// md5.update(String(users[user]).split('').join('d'));
+			if (users[user] == passwd) {
 				var session = new Session(device, this);
 				device[session.id] = session; // add session
 				this.m_session_id = session.id;
 				this.m_session = session;
+				this.m_cols = Number(cols) || 80;
+				this.m_rows = Number(rows) || 30;
 				return true;
 			}
-		} else {
-			return false;
 		}
+		return false;
 	},
 
-	/** 
+	get cols() {
+		return this.m_cols;
+	},
+
+	get rows() {
+		return this.m_rows;
+	},
+
+	/**
 	 *@get status
 	 */
 	getStatus: async function() {
 		return this.m_status;
+	},
+
+	setSize: function({ cols = 80, rows = 30 }) {
+		this.m_cols = cols;
+		this.m_rows = rows;
+		if (this.m_recipient) {
+			this.m_recipient.$setSizeChange(cols, rows);
+		}
 	},
 
 });
@@ -194,6 +211,7 @@ var DTTYServer = utils.class('DTTYServer', Basic, {
 	 *@event onConnectRequest
 	 */
 	onConnectRequest: null,
+	onSizeChange: null,
 
 	// @overwrite
 	m_open: function() {
@@ -215,10 +233,14 @@ var DTTYServer = utils.class('DTTYServer', Basic, {
 		}
 	},
 
+	$setSizeChange: function(cols, rows) {
+		this.trigger('SizeChange', { cols, rows });
+	},
+
 	/**
-	 * @func auth()
+	 * @func requestAuth()
 	 */
-	auth: function() {
+	requestAuth: async function() {
 		if (this.deviceId && this.params.session) {
 			if (all_device_session[this.deviceId]) {
 				var session = all_device_session[this.deviceId][this.params.session];
@@ -241,6 +263,16 @@ var DTTYServer = utils.class('DTTYServer', Basic, {
 			this.m_recipient.conv.close();
 		}
 		this.conv.close();
+	},
+
+	/**
+	 * @func getSize()
+	 */
+	getSize: async function() {
+		return {
+			cols: this.m_recipient.cols,
+			rows: this.m_recipient.rows,
+		};
 	},
 
 });
