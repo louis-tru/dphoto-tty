@@ -8,12 +8,7 @@ var server = require('ngui-utils/server');
 var { ClientService } = require('ngui-utils/cli_service');
 var crypto = require('crypto');
 var fs = require('ngui-utils/fs');
-
-// check users
-if (!fs.existsSync(__dirname + '/users.js')) {
-	fs.cp_sync(__dirname + '/.users.js', __dirname + '/users.js');
-}
-var users = require('./users');
+var { users = {} } = utils.config;
 
 var all_device_session = {
 	/**

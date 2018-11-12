@@ -100,7 +100,7 @@ class TTYClient {
 		this.m_cli.addEventListener('Status', e=>this.m_set_status(e.data));
 		this.m_cli.addEventListener('Exit', e=>this.m_exit(e.data));
 
-		process.stdout.write('Connecting...\n');
+		process.stdout.write('\nConnecting...\n');
 	}
 
 	m_open() {

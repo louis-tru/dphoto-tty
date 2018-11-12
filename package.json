@@ -3,12 +3,12 @@
 	"version": "0.1.1",
 	"main": "main-tty.js",
 	"bin": {
-		"dttyd": "bin/dttyd.js",
-		"dtty": "bin/dtty.js",
-		"dttyfs": "bin/dttyfs.js"
+		"dttyd": "dttyd.js",
+		"dtty": "dtty.js",
+		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
-		"ngui-utils": "^0.6.1",
+		"ngui-utils": "^0.6.2",
 		"pty.js": "^0.3.1"
 	}
 }
