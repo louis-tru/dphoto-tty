@@ -14,7 +14,7 @@ dtty:
 	$(NODE) --inspect=0.0.0.0:9227 dtty.js test@127.0.0.1
 
 install:
-	npm i -g
+	npm i --unsafe-perm -g
 
 install_dttyfs: install
 	cp dttyfs.service /lib/systemd/system
