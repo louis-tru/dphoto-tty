@@ -149,10 +149,10 @@ class TTYServer {
 		this.m_monitor = new Monitor(30* 1000, -1);
 		this.m_monitor.start(async e=>{
 			try {
-				var r = await this.m_req.get('api/getSessionList', 
+				var { data } = await this.m_req.get('api/getSessionList', 
 					{ deviceId: this.m_device_id }
 				);
-				r.forEach(e=>{
+				data.forEach(e=>{
 					if (!this.m_sessions[e]) {
 						new Session(this, e);
 					}
