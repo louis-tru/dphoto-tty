@@ -8,6 +8,7 @@ var log = require('./log');
 var { WSConversation, Client } = require('ngui-utils/cli');
 var readline = require('readline');
 var crypto = require('crypto');
+var paths = require('./paths');
 
 /**
  * @class TTYClient

@@ -4,9 +4,10 @@
  */
 
 var fs = require('ngui-utils/fs');
-var variable = '/mnt/dphotos/dphoto-tty/var';
+var variable = __dirname + '/var';
 
 fs.mkdir_p_sync(variable);
+fs.writeFileSync(`${variable}/pid`, process.pid);
 
 module.exports = {
 	var: variable,

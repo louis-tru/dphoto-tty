@@ -10,6 +10,7 @@ var { WSConversation, Client } = require('ngui-utils/cli');
 var { Monitor } = require('ngui-utils/monitor');
 var { Request } = require('ngui-utils/request');
 var pty = require('pty.js');
+var fs = require('ngui-utils/fs');
 
 /**
  * @class Session

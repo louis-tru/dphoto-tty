@@ -13,15 +13,12 @@ var paths = require('./paths');
 var session = require('./session');
 var api = require('./api');
 
-fs.mkdir_p_sync(`${paths.var}/temp`);
-fs.writeFileSync(`${paths.var}/temp/pid`, process.pid);
-
 service.set('tty', session.DTTYClient);
 service.set('ttyd', session.DTTYServer);
 service.set('api', api);
 
 server.setShared(new server.Server({
-	temp: `${paths.var}/temp`,
+	temp: `${paths.var}`,
 	root: `${__dirname}/public`,
 	port: 8095,
 	host: '0.0.0.0',
