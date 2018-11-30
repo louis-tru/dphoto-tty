@@ -5,7 +5,7 @@
 
 var utils = require('ngui-utils');
 var log = require('./log');
-var child_process = require('child_process');
+var { exec } = require('ngui-utils/syscall');
 var { WSConversation, Client } = require('ngui-utils/cli');
 var { Monitor } = require('ngui-utils/monitor');
 var { Request } = require('ngui-utils/request');
@@ -56,8 +56,20 @@ class Session {
 			return;
 		}
 
+		var sh = 'sh';
+
+		if ((await exec('which bash')).stdout[0]) {
+			sh = 'bash';
+		} else if ((await exec('which ash')).stdout[0]) {
+			sh = 'ash';
+		} else if ((await exec('which zsh')).stdout[0]) {
+			sh = 'zsh';
+		} else if ((await exec('which csh')).stdout[0]) {
+			sh = 'csh';
+		}
+		
 		// create child process
-		var term = pty.spawn('bash', [], {
+		var term = pty.spawn(sh, [], {
 			name: 'xterm-color',
 			cols: cols,
 			rows: rows,
