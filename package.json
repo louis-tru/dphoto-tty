@@ -1,6 +1,6 @@
 {
 	"name": "dphoto-tty",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"main": "main-tty.js",
 	"bin": {
 		"dttyd": "dttyd.js",
