@@ -9,7 +9,7 @@
 		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
-		"ngui-utils": "^0.7.4",
+		"ngui-utils": "^0.7.5",
 		"pty.js": "^0.3.1"
 	}
 }
