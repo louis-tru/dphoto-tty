@@ -74,7 +74,7 @@ class Session {
 			cols: cols,
 			rows: rows,
 			cwd: process.env.HOME,
-			env: process.env,
+			env: { LC_ALL:'zh_CN.UTF-8', ...process.env },
 		});
 
 		term.on('data', (e)=>{
