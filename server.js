@@ -3,14 +3,14 @@
  * @date 2018-11-05
  */
 
-var utils = require('ngui-utils');
+var utils = require('qgr-utils');
 var log = require('./log');
-var { exec } = require('ngui-utils/syscall');
-var { WSConversation, Client } = require('ngui-utils/cli');
-var { Monitor } = require('ngui-utils/monitor');
-var { Request } = require('ngui-utils/request');
+var { exec } = require('qgr-utils/syscall');
+var { WSConversation, Client } = require('qgr-utils/cli');
+var { Monitor } = require('qgr-utils/monitor');
+var { Request } = require('qgr-utils/request');
 var pty = require('pty.js');
-var fs = require('ngui-utils/fs');
+var fs = require('qgr-utils/fs');
 
 /**
  * @class Session
@@ -79,7 +79,7 @@ class Session {
 
 		term.on('data', (e)=>{
 			if (this.m_activity) {
-				this.m_cli.conv.send(new Buffer(e, 'binary'));
+				this.m_cli.conv.send(new Buffer(e));
 			}
 		});
 

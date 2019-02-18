@@ -25,12 +25,3 @@ install_dttyd: install
 	cp dttyd.service /lib/systemd/system
 	systemctl enable dttyd
 	systemctl daemon-reload
-
-lc_link = if [ -d $1 ]; then \
-						rm node_modules/$(shell basename $1) -rf;\
-						ln -s $1 node_modules/$(shell basename $1); \
-					fi
-
-install:
-	@-npm install --only=prod
-	@$(call lc_link,$(NGUI)/node_modules/ngui-utils)

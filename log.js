@@ -3,9 +3,9 @@
  * @date 2018-07-09
  */
 
-var utils = require('ngui-utils');
+var utils = require('qgr-utils');
 var paths = require('./paths');
-var log = require('ngui-utils/log');
+var log = require('qgr-utils/log');
 
 if (!log.defaultConsole) {
 	

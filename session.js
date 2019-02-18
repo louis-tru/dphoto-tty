@@ -3,11 +3,11 @@
  * @date 2018-11-05
  */
 
-var utils = require('ngui-utils');
-var server = require('ngui-utils/server');
-var { ClientService } = require('ngui-utils/cli_service');
+var utils = require('qgr-utils');
+var server = require('qgr-utils/server');
+var { ClientService } = require('qgr-utils/cli_service');
 var crypto = require('crypto');
-var fs = require('ngui-utils/fs');
+var fs = require('qgr-utils/fs');
 var { users = {} } = utils.config;
 
 var all_device_session = {

@@ -4,7 +4,7 @@
  * @date 2018-11-05
  */
 
-var arguments = require('ngui-utils/arguments');
+var arguments = require('qgr-utils/arguments');
 var { TTYClient } = require('./client');
 
 var opts = arguments.options;

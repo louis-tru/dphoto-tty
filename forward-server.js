@@ -3,12 +3,12 @@
  * @date 2018-11-05
  */
 
-var utils = require('ngui-utils');
-var fs = require('ngui-utils/fs');
+var utils = require('qgr-utils');
+var fs = require('qgr-utils/fs');
 var log = require('./log');
-var server = require('ngui-utils/server');
-var service = require('ngui-utils/service');
-var fs = require('ngui-utils/fs');
+var server = require('qgr-utils/server');
+var service = require('qgr-utils/service');
+var fs = require('qgr-utils/fs');
 var paths = require('./paths');
 var session = require('./session');
 var api = require('./api');

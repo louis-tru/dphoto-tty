@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('ngui-utils');
+var utils = require('qgr-utils');
 var log = require('./log');
-var { WSConversation, Client } = require('ngui-utils/cli');
+var { WSConversation, Client } = require('qgr-utils/cli');
 var readline = require('readline');
 var crypto = require('crypto');
 var paths = require('./paths');

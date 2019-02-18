@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('ngui-utils');
+var utils = require('qgr-utils');
 var session = require('./session');
-var { ViewController } = require('ngui-utils/ctr');
+var { ViewController } = require('qgr-utils/ctr');
 
 /**
  * @class API

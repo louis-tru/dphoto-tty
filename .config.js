@@ -10,6 +10,6 @@ module.exports = {
 	dttyd: {
 		host: 'www.dphotos.com.cn',
 		port: 8095,
-		device_id: 'test',
+		device_id: 'louis.ubuntu.com',
 	},
 };
