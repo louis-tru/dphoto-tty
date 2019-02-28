@@ -9,7 +9,7 @@
 		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
-		"qgr-utils": "^0.7.20",
+		"qgr-utils": "^0.8.4",
 		"pty.js": "^0.3.1"
 	}
 }
