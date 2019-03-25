@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('qgr-utils');
+var utils = require('qkit');
 var session = require('./session');
-var { ViewController } = require('qgr-utils/ctr');
+var { ViewController } = require('qkit/ctr');
 
 /**
  * @class API

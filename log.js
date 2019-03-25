@@ -3,9 +3,9 @@
  * @date 2018-07-09
  */
 
-var utils = require('qgr-utils');
+var utils = require('qkit');
 var paths = require('./paths');
-var log = require('qgr-utils/log');
+var log = require('qkit/log');
 
 if (!log.defaultConsole) {
 	

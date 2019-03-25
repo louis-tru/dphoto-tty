@@ -4,7 +4,7 @@
  * @date 2018-11-05
  */
 
-var arguments = require('qgr-utils/arguments');
+var arguments = require('qkit/arguments');
 var { TTYClient } = require('./client');
 
 var opts = arguments.options;

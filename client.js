@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('qgr-utils');
+var utils = require('qkit');
 var log = require('./log');
-var { WSConversation, Client } = require('qgr-utils/cli');
+var { WSConversation, Client } = require('qkit/cli');
 var readline = require('readline');
 var crypto = require('crypto');
 var paths = require('./paths');

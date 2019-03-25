@@ -3,11 +3,11 @@
  * @date 2018-11-05
  */
 
-var utils = require('qgr-utils');
-var server = require('qgr-utils/server');
-var { ClientService } = require('qgr-utils/cli_service');
+var utils = require('qkit');
+var server = require('qkit/server');
+var { ClientService } = require('qkit/cli_service');
 var crypto = require('crypto');
-var fs = require('qgr-utils/fs');
+var fs = require('qkit/fs');
 var { users = {} } = utils.config;
 
 var all_device_session = {

@@ -3,7 +3,7 @@
  * @date 2018-11-05
  */
 
-var fs = require('qgr-utils/fs');
+var fs = require('qkit/fs');
 var variable = __dirname + '/var';
 
 fs.mkdir_p_sync(variable);

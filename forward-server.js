@@ -3,12 +3,12 @@
  * @date 2018-11-05
  */
 
-var utils = require('qgr-utils');
-var fs = require('qgr-utils/fs');
+var utils = require('qkit');
+var fs = require('qkit/fs');
 var log = require('./log');
-var server = require('qgr-utils/server');
-var service = require('qgr-utils/service');
-var fs = require('qgr-utils/fs');
+var server = require('qkit/server');
+var service = require('qkit/service');
+var fs = require('qkit/fs');
 var paths = require('./paths');
 var session = require('./session');
 var api = require('./api');

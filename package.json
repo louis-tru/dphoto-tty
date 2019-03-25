@@ -1,6 +1,6 @@
 {
 	"name": "dphoto-tty",
-	"version": "0.1.11",
+	"version": "0.1.12",
 	"main": "main-tty.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
@@ -9,7 +9,7 @@
 		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
-		"qgr-utils": "^0.8.4",
+		"qkit": "^0.8.12",
 		"pty.js": "^0.3.1"
 	}
 }

@@ -3,14 +3,14 @@
  * @date 2018-11-05
  */
 
-var utils = require('qgr-utils');
+var utils = require('qkit');
 var log = require('./log');
-var { exec } = require('qgr-utils/syscall');
-var { WSConversation, Client } = require('qgr-utils/cli');
-var { Monitor } = require('qgr-utils/monitor');
-var { Request } = require('qgr-utils/request');
+var { exec } = require('qkit/syscall');
+var { WSConversation, Client } = require('qkit/cli');
+var { Monitor } = require('qkit/monitor');
+var { Request } = require('qkit/request');
 var pty = require('pty.js');
-var fs = require('qgr-utils/fs');
+var fs = require('qkit/fs');
 
 /**
  * @class Session
