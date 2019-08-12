@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('qkit');
+var utils = require('langoukit');
 var log = require('./log');
-var { WSConversation, Client } = require('qkit/cli');
+var { WSConversation, Client } = require('langoukit/cli');
 var readline = require('readline');
 var crypto = require('crypto');
 var paths = require('./paths');

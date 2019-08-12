@@ -4,7 +4,7 @@
  * @date 2018-11-05
  */
 
-var arguments = require('qkit/arguments');
+var arguments = require('langoukit/arguments');
 var { TTYClient } = require('./client');
 
 var opts = arguments.options;

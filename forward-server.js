@@ -3,12 +3,12 @@
  * @date 2018-11-05
  */
 
-var utils = require('qkit');
-var fs = require('qkit/fs');
+var utils = require('langoukit');
+var fs = require('langoukit/fs');
 var log = require('./log');
-var server = require('qkit/server');
-var service = require('qkit/service');
-var fs = require('qkit/fs');
+var server = require('langoukit/server');
+var service = require('langoukit/service');
+var fs = require('langoukit/fs');
 var paths = require('./paths');
 var session = require('./session');
 var api = require('./api');

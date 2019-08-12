@@ -3,11 +3,11 @@
  * @date 2018-11-05
  */
 
-var utils = require('qkit');
-var server = require('qkit/server');
-var { ClientService } = require('qkit/cli_service');
+var utils = require('langoukit');
+var server = require('langoukit/server');
+var { ClientService } = require('langoukit/cli_service');
 var crypto = require('crypto');
-var fs = require('qkit/fs');
+var fs = require('langoukit/fs');
 var { users = {} } = utils.config;
 
 var all_device_session = {

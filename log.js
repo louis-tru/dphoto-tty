@@ -3,9 +3,9 @@
  * @date 2018-07-09
  */
 
-var utils = require('qkit');
+var utils = require('langoukit');
 var paths = require('./paths');
-var log = require('qkit/log');
+var log = require('langoukit/log');
 
 if (!log.defaultConsole) {
 	

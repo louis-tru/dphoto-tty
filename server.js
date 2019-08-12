@@ -3,14 +3,14 @@
  * @date 2018-11-05
  */
 
-var utils = require('qkit');
+var utils = require('langoukit');
 var log = require('./log');
-var { exec } = require('qkit/syscall');
-var { WSConversation, Client } = require('qkit/cli');
-var { Monitor } = require('qkit/monitor');
-var { Request } = require('qkit/request');
+var { exec } = require('langoukit/syscall');
+var { WSConversation, Client } = require('langoukit/cli');
+var { Monitor } = require('langoukit/monitor');
+var { Request } = require('langoukit/request');
 var pty = require('pty.js');
-var fs = require('qkit/fs');
+var fs = require('langoukit/fs');
 
 /**
  * @class Session

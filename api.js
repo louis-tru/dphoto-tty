@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('qkit');
+var utils = require('langoukit');
 var session = require('./session');
-var { ViewController } = require('qkit/ctr');
+var { ViewController } = require('langoukit/ctr');
 
 /**
  * @class API

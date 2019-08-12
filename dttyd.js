@@ -4,9 +4,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('qkit');
-var arguments = require('qkit/arguments');
-var { exec, execSync } = require('qkit/syscall');
+var utils = require('langoukit');
+var arguments = require('langoukit/arguments');
+var { exec, execSync } = require('langoukit/syscall');
 var { TTYServer } = require('./server');
 var { host = '127.0.0.1', port = 8095, device_id } = utils.config.dttyd || {};
 
