@@ -9,7 +9,7 @@
 		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
-		"langoukit": "^0.8.51",
+		"langoukit": "^0.8.52",
 		"pty.js": "^0.3.1"
 	}
 }
