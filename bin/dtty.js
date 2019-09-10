@@ -4,8 +4,8 @@
  * @date 2018-11-05
  */
 
-var arguments = require('langoukit/arguments');
-var { TTYClient } = require('./client');
+var arguments = require('lkit/arguments');
+var { TTYClient } = require('../client');
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;

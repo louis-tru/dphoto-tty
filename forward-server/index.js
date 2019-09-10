@@ -3,13 +3,12 @@
  * @date 2018-11-05
  */
 
-var utils = require('langoukit');
-var fs = require('langoukit/fs');
-var log = require('./log');
-var server = require('langoukit/server');
-var service = require('langoukit/service');
-var fs = require('langoukit/fs');
-var paths = require('./paths');
+var utils = require('lkit');
+var log = require('../log');
+// var fs = require('lkit/fs');
+var server = require('lkit/server');
+var service = require('lkit/service');
+var paths = require('../paths');
 var session = require('./session');
 var api = require('./api');
 

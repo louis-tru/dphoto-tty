@@ -3,9 +3,9 @@
  * @date 2018-07-09
  */
 
-var utils = require('langoukit');
+var utils = require('lkit');
 var paths = require('./paths');
-var log = require('langoukit/log');
+var log = require('lkit/log');
 
 if (!log.defaultConsole) {
 	

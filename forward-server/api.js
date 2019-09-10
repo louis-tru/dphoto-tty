@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('langoukit');
+var utils = require('lkit');
 var session = require('./session');
-var { ViewController } = require('langoukit/ctr');
+var { ViewController } = require('lkit/ctr');
 
 /**
  * @class API

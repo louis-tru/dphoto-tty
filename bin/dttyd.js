@@ -4,10 +4,10 @@
  * @date 2018-11-05
  */
 
-var utils = require('langoukit');
-var arguments = require('langoukit/arguments');
-var { exec, execSync } = require('langoukit/syscall');
-var { TTYServer } = require('./server');
+var utils = require('lkit');
+var arguments = require('lkit/arguments');
+var { exec, execSync } = require('lkit/syscall');
+var { TTYServer } = require('../server');
 var { host = '127.0.0.1', port = 8095, device_id } = utils.config.dttyd || {};
 
 var opts = arguments.options;
