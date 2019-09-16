@@ -3,7 +3,7 @@
  * @date 2018-11-05
  */
 
-var fs = require('lkit/fs');
+var fs = require('nxkit/fs');
 var variable = __dirname + '/var';
 
 fs.mkdir_p_sync(variable);

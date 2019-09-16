@@ -2,6 +2,10 @@
 NODE 	?= node
 UNAME ?= $(shell uname)
 
+ifneq ($(USER),root)
+	SUDO = "sudo"
+endif
+
 .PHONY: dttyfs dttyd dtty install install_dttyfs install_dttyd
 
 dttyfs:
@@ -14,14 +18,15 @@ dtty:
 	$(NODE) --inspect=0.0.0.0:9227 bin/dtty.js test@127.0.0.1
 
 install:
-	npm i -g --unsafe-perm
+	npm install --unsafe-perm
+	$(SUDO) npm i -g --unsafe-perm
 
 install_dttyfs: install
 	cp dttyfs.service /lib/systemd/system
-	systemctl enable dttyfs
-	systemctl daemon-reload
+	$(SUDO) systemctl enable dttyfs
+	$(SUDO) systemctl daemon-reload
 
 install_dttyd: install
 	cp dttyd.service /lib/systemd/system
-	systemctl enable dttyd
-	systemctl daemon-reload
+	$(SUDO) systemctl enable dttyd
+	$(SUDO) systemctl daemon-reload

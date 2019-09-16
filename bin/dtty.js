@@ -4,7 +4,7 @@
  * @date 2018-11-05
  */
 
-var arguments = require('lkit/arguments');
+var arguments = require('nxkit/arguments');
 var { TTYClient } = require('../client');
 
 var opts = arguments.options;

@@ -3,9 +3,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('lkit');
+var utils = require('nxkit');
 var session = require('./session');
-var { ViewController } = require('lkit/ctr');
+var { ViewController } = require('nxkit/ctr');
 
 /**
  * @class API

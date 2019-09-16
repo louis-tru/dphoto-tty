@@ -3,14 +3,14 @@
  * @date 2018-11-05
  */
 
-var utils = require('lkit');
+var utils = require('nxkit');
 var log = require('../log');
-var { exec } = require('lkit/syscall');
-var { WSConversation, Client } = require('lkit/cli');
-var { Monitor } = require('lkit/monitor');
-var { Request } = require('lkit/request');
+var { exec } = require('nxkit/syscall');
+var { WSConversation, Client } = require('nxkit/cli');
+var { Monitor } = require('nxkit/monitor');
+var { Request } = require('nxkit/request');
 var pty = require('pty.js');
-// var fs = require('lkit/fs');
+// var fs = require('nxkit/fs');
 
 /**
  * @class Session

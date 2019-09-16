@@ -3,11 +3,11 @@
  * @date 2018-11-05
  */
 
-var utils = require('lkit');
+var utils = require('nxkit');
 var log = require('../log');
-// var fs = require('lkit/fs');
-var server = require('lkit/server');
-var service = require('lkit/service');
+// var fs = require('nxkit/fs');
+var server = require('nxkit/server');
+var service = require('nxkit/service');
 var paths = require('../paths');
 var session = require('./session');
 var api = require('./api');

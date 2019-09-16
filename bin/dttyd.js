@@ -4,9 +4,9 @@
  * @date 2018-11-05
  */
 
-var utils = require('lkit');
-var arguments = require('lkit/arguments');
-var { exec, execSync } = require('lkit/syscall');
+var utils = require('nxkit');
+var arguments = require('nxkit/arguments');
+var { exec, execSync } = require('nxkit/syscall');
 var { TTYServer } = require('../server');
 var { host = '127.0.0.1', port = 8095, device_id } = utils.config.dttyd || {};
 

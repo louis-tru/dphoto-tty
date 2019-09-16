@@ -3,11 +3,11 @@
  * @date 2018-11-05
  */
 
-var utils = require('lkit');
-// var server = require('lkit/server');
-var { ClientService } = require('lkit/cli_service');
+var utils = require('nxkit');
+// var server = require('nxkit/server');
+var { ClientService } = require('nxkit/cli_service');
 // var crypto = require('crypto');
-// var fs = require('lkit/fs');
+// var fs = require('nxkit/fs');
 var { users = {} } = utils.config;
 
 var all_device_session = {

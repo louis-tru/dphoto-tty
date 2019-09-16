@@ -3,9 +3,9 @@
  * @date 2018-07-09
  */
 
-var utils = require('lkit');
+var utils = require('nxkit');
 var paths = require('./paths');
-var log = require('lkit/log');
+var log = require('nxkit/log');
 
 if (!log.defaultConsole) {
 	
