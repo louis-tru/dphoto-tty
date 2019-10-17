@@ -9,7 +9,7 @@ var { exec } = require('nxkit/syscall');
 var { WSConversation, Client } = require('nxkit/cli');
 var { Monitor } = require('nxkit/monitor');
 var { Request } = require('nxkit/request');
-var pty = require('pty.js');
+var pty = require('ptyjs2');
 // var fs = require('nxkit/fs');
 
 /**

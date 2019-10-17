@@ -9,7 +9,7 @@
 		"dttyfs": "bin/dttyfs.js"
 	},
 	"dependencies": {
-		"nxkit": "^0.8.52",
-		"pty.js": "^0.3.1"
+		"nxkit": "^0.8.58",
+		"ptyjs2": "^0.3.2"
 	}
 }
