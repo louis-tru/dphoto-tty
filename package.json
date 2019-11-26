@@ -4,9 +4,9 @@
 	"main": "main-tty.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
-		"dttyd": "bin/dttyd.js",
-		"dtty": "bin/dtty.js",
-		"dttyfs": "bin/dttyfs.js"
+		"dttyd": "dttyd.js",
+		"dtty": "dtty.js",
+		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
 		"nxkit": "0.8.58",

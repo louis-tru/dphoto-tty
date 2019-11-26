@@ -7,9 +7,8 @@
 var utils = require('nxkit');
 var arguments = require('nxkit/arguments');
 var { exec, execSync } = require('nxkit/syscall');
-var { TTYServer } = require('../server');
-var { host = '127.0.0.1', port = 8095, device_id } = 
-	Object.assign(require('../.config').dttyd, utils.config.dttyd);
+var { TTYServer } = require('./server');
+var { host = '127.0.0.1', port = 8095, device_id } = utils.config.dttyd || {};
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;

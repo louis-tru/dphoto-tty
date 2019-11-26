@@ -5,7 +5,7 @@
 
 var utils = require('nxkit');
 // var server = require('nxkit/server');
-var { ClientService } = require('nxkit/cli_service');
+var { WSService } = require('nxkit/ws/service');
 // var crypto = require('crypto');
 // var fs = require('nxkit/fs');
 var { users = {} } = utils.config;
@@ -39,7 +39,7 @@ class Session {
 /**
  * @class Basic
  */
-class Basic extends ClientService {
+class Basic extends WSService {
 	// m_message: null,
 	// m_recipient: null, // conv
 	// m_session_id: 0,
@@ -66,10 +66,10 @@ class Basic extends ClientService {
 		this.m_session = null;
 		conv.onOpen.on(e=>this.m_OnOpen());
 		conv.onClose.on(e=>this.m_OnClose());
-		conv.onMessage.on(e=>this.m_Handle_send_data(e.data));
+		conv.onMessage.on(e=>this.m_handle_send_data(e.data));
 	}
 
-	m_Handle_send_data({ type, data }) {
+	m_handle_send_data({ type, data }) {
 		if (type == 1) {
 			if (this.m_recipient) {
 				this.m_recipient.conv.send(data);

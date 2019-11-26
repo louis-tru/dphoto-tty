@@ -6,7 +6,7 @@
 var utils = require('nxkit');
 var log = require('../log');
 var { exec } = require('nxkit/syscall');
-var { WSConversation, Client } = require('nxkit/cli');
+var { WSConversation, WSClient } = require('nxkit/ws/cli');
 var { Monitor } = require('nxkit/monitor');
 var { Request } = require('nxkit/request');
 var pty = require('ptyjs2');
@@ -49,7 +49,7 @@ class Session {
 
 		term.on('data', (e)=>{
 			if (this.m_activity) {
-				this.m_cli.conv.send(new Buffer(e));
+				this.m_cli.conv.send(Buffer.from(e));
 			}
 		});
 
@@ -130,7 +130,7 @@ class Session {
 		this.m_conv.onClose.on(e=>this.m_handle_close().catch(console.error));
 		this.m_conv.onMessage.on(e=>this.m_handle_data(e.data));
 		this.m_conv.onError.on(e=>this.m_handle_error(e.data));
-		this.m_cli = new Client('ttyd', this.m_conv);
+		this.m_cli = new WSClient('ttyd', this.m_conv);
 		this.m_cli.addEventListener('OuterConnectRequest', e=>this.m_outer_connect_request(e.data));
 		this.m_cli.addEventListener('TerminalSizeChange', e=>this.m_size_change(e.data));
 	}

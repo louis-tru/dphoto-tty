@@ -5,7 +5,7 @@
 
 var utils = require('nxkit');
 var log = require('../log');
-var { WSConversation, Client } = require('nxkit/cli');
+var { WSConversation, WSClient } = require('nxkit/ws/cli');
 var readline = require('readline');
 var crypto = require('crypto');
 // var paths = require('../paths');
@@ -147,7 +147,7 @@ class TTYClient {
 		this.m_conv.onClose.on(e=>this.m_handle_close());
 		this.m_conv.onMessage.on(e=>this.m_handle_data(e.data));
 		this.m_conv.onError.on(e=>this.m_handle_error(e.data));
-		this.m_cli = new Client('tty', this.m_conv);
+		this.m_cli = new WSClient('tty', this.m_conv);
 		this.m_cli.addEventListener('Status', e=>this.m_handle_status(e.data));
 		this.m_cli.addEventListener('Exit', e=>this.m_handle_exit(e.data));
 

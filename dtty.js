@@ -5,7 +5,7 @@
  */
 
 var arguments = require('nxkit/arguments');
-var { TTYClient } = require('../client');
+var { TTYClient } = require('./client');
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;
