@@ -9,7 +9,7 @@
 		"dttyfs": "dttyfs.js"
 	},
 	"dependencies": {
-		"nxkit": "0.8.58",
-		"ptyjs2": "0.3.2"
+		"nxkit": "~0.9.13",
+		"ptyjs2": "~0.3.2"
 	}
 }
