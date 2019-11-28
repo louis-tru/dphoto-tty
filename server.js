@@ -16,6 +16,11 @@ class Client extends cli.FMTClient {
 		super(...args);
 		this.m_terminals = {};
 	}
+
+	terminal() {
+		
+	}
+
 }
 
 /**
@@ -29,9 +34,10 @@ class TTYServer {
 
 	constructor({ host = '127.0.0.1', port = 8095, ssl = false, id = '', certificate = null }) {
 		utils.assert(id);
-		certificate = { ...certificate, role: 'device' };
-		var url = `fmt${ssl?'s':''}://${host}:${port}/`;
-		this.m_cli = new Client(id, url, certificate);
+		this.m_cli = new Client(id, 
+			`fmt${ssl?'s':''}://${host}:${port}/`, 
+			{ ...certificate, role: 'device' }
+		);
 	}
 
 }
