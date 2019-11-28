@@ -8,7 +8,7 @@ module.exports = {
 		admin: '42f390026b5ed41b5a45a297c3d42e3d',
 	},
 	dttyd: {
-		host: 'www.dphotos.com.cn',
+		host: 'dttyd.stars-mine.com',
 		port: 8095,
 		device_id: 'louis.ubuntu.com',
 	},

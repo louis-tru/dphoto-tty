@@ -5,7 +5,7 @@
 
 var utils = require('nxkit');
 var pty = require('ptyjs2');
-var log = require('../log');
+var log = require('./log');
 var {Notification} = require('nxkit/event');
 var { exec } = require('nxkit/syscall');
 
@@ -15,19 +15,19 @@ var { exec } = require('nxkit/syscall');
 class Terminal extends Notification {
 
 	constructor(cols, rows) {
-		this._init(cols, rows);
+		this._init(cols, rows).catch(console.error);
 	}
 
 	async _init(cols, rows) {
 		var sh = 'sh';
 
-		if ((await exec('which bash')).stdout[0]) {
+		if ((await exec('which bash')).first) {
 			sh = 'bash';
-		} else if ((await exec('which ash')).stdout[0]) {
+		} else if ((await exec('which ash')).first) {
 			sh = 'ash';
-		} else if ((await exec('which zsh')).stdout[0]) {
+		} else if ((await exec('which zsh')).first) {
 			sh = 'zsh';
-		} else if ((await exec('which csh')).stdout[0]) {
+		} else if ((await exec('which csh')).first) {
 			sh = 'csh';
 		}
 

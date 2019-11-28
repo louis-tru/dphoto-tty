@@ -5,6 +5,5 @@
 
 var { TTYServer } = require('./server');
 var { TTYClient } = require('./client');
-var { TTYForwardServer } = require('./forward-server');
 
-module.exports = { TTYServer, TTYClient, TTYForwardServer };
+module.exports = { TTYServer, TTYClient };
