@@ -15,6 +15,7 @@ var { exec } = require('nxkit/syscall');
 class Terminal extends Notification {
 
 	constructor(cols, rows) {
+		super();
 		this._init(cols, rows).catch(console.error);
 	}
 
@@ -46,7 +47,7 @@ class Terminal extends Notification {
 
 		term.on('exit', code=>{
 			this.m_term = null;
-			this.trigger('Exit', { code });
+			this.trigger('Exit', code);
 		});
 
 		this.m_term = term;
@@ -62,16 +63,22 @@ class Terminal extends Notification {
 			this.m_term.write(data);
 	}
 
-	async close() {
-		if (this.m_term) {
-			while (this.m_term && this.m_term.writable) {
-				this.m_term.kill(); // kill 
-				await utils.sleep(200);
-			}
+	async _kill() {
+		await utils.sleep(200);
+		while (this.m_term && this.m_term.writable) {
+			this.m_term.kill(9); // kill 
+			await utils.sleep(200);
 		}
-		this.m_term = null;
 	}
 
+	kill(code, force) {
+		if (this.m_term && this.m_term.writable) {
+			this.m_term.kill(code); // kill 
+			if (force) {
+				this._kill().catch(console.error);
+			}
+		}
+	}
 }
 
 module.exports = Terminal;

@@ -4,86 +4,113 @@
  */
 
 var utils = require('nxkit');
-var log = require('../log');
-var { WSConversation, WSClient } = require('nxkit/ws/cli');
+var log = require('./log');
 var readline = require('readline');
 var crypto = require('crypto');
-// var paths = require('../paths');
+var cli = require('nxkit/fmt/cli');
+var uuid = require('nxkit/hash/uuid');
+// var errno = require('./errno');
+
+/**
+ * @class Client
+ */
+class Client extends cli.FMTClient {
+	get thatId() {
+		return this.m_host.thatId;
+	}
+	constructor(host, ...args) {
+		super(uuid(), ...args);
+		this.m_host = host;
+		this.m_that = this.that(host.thatId);
+	}
+	_exec() {}
+}
+
+/**
+ * @class Terminal
+ */
+class Terminal extends Client {
+	/**
+	 * @overwrite
+	 */
+	async _exec() {
+		await this.subscribe(['Data','Exit']);
+
+		var getSize = ()=>({ 
+			rows: process.stdout.rows, columns: process.stdout.columns 
+		});
+		var offline = ()=>{
+			utils.sleep(200).then(e=>{
+				process.stdin.setRawMode(false);
+				process.exit(0);
+			});
+		};
+
+		this.addEventListener('Data', e=>process.stdout.write(e.data));
+		this.addEventListener('Exit', offline);
+		this.addEventListener(`Logout-${this.thatId}`, offline);
+		this.addEventListener('Offline', offline);
+
+		var that = this.m_that;
+		var tid = await that.call('terminal', getSize());
+
+		process.stdout.on('resize', e=>{
+			that.call('terminalResize', {tid, ...getSize() }).catch(console.error);
+		});
+		process.stdin.on('data', async e=>{
+			try {
+				await that.call('terminalWrite', [tid,e]);
+			} catch(err) {
+				console.log(err);
+				offline();
+			}
+		});
+
+		process.stdin.setRawMode(true);
+		process.stdin.resume();
+	}
+}
+
+const Programs = {
+	terminal: Terminal,
+};
 
 /**
  * @class TTYClient
  */
 class TTYClient {
 
-	m_handle_open() {
-		process.stdout.on('resize', e=>{
-			if (this.m_status) {
-				var { rows, columns } = process.stdout;
-				this.m_cli.send('setSize', { rows, cols: columns });
-			}
-		});
-		process.stdin.on('data', e=>{
-			if (this.m_status) {
-				this.m_conv.send(e);
-			}
-		});
+	get user() {
+		return this.m_user;
 	}
 
-	m_handle_close() {
-		process.exit(0);
+	get id() {
+		this.m_cli.id;
 	}
 
-	m_handle_error(err) {
-		console.error(err.message);
-		process.exit(0);
+	get thatId() {
+		return this.m_thatId;
 	}
 
-	m_handle_data({ type, data }) {
-		if (type == 1) {
-			process.stdout.write(data);
-		}
-	}
-
-	m_handle_status(status) {
-		if (status && !this.m_init) {
-			process.stdin.setRawMode(true);
-			process.stdin.resume();
-			this.m_init = true;
-			this.m_raw_log = console.log;
-			this.m_raw_error = console.error;
-			// TODO ? 屏蔽node日志
-			// console.log = utils.noop;
-			// console.error = utils.noop;
-		}
-		this.m_status = status;
-	}
-
-	m_handle_exit(code) {
-		process.exit(code);
-	}
-
-	constructor({ host = '127.0.0.1', port = 8095, ssl = false, deviceId = '' }) {
-		utils.assert(deviceId);
-		this.m_cli = null;
-		this.m_status = 0;
+	constructor({ host = '127.0.0.1', port = 8095, ssl = false, thatId = '' }) {
+		utils.assert(thatId);
 		this.m_user = '';
-		this.m_passwd = '';
-		this.m_url = `${ssl ? 'wss': 'ws'}://${host}:${port}`;
-		this.m_url += '?device_id=' + deviceId;
-		this.m_init = false;
+		this.m_url = `fmt${ssl?'s':''}://${host}:${port}/`;
+		this.m_thatId = thatId;
+		this.m_cli = null;
 	}
 
 	/**
-	 * @func start()
+	 * @func terminal()
 	 */
-	start() {
-		utils.assert(!this.m_is_start);
-		this.m_is_start = true;
-		this.m_start().catch(console.error);
+	terminal() {
+		this._run('terminal').catch(console.error);
 	}
 
-	async m_start() {
-		
+	async _run(cmd, ...args) {
+		utils.assert(!this._is_run);
+		this._is_run = true;
+
 		var self = this;
 
 		function start_readline() {
@@ -126,32 +153,21 @@ class TTYClient {
 
 		end_readline();
 
-		var { rows, columns } = process.stdout;
+		// passwd = passwd.split('').join('d') + '\n';
+		passwd = crypto.createHash('md5').update(passwd).digest('hex');
 
-		passwd = passwd.split('').join('d') + '\n';
-
-		var md5 = crypto.createHash('md5');
-		md5.update(passwd);
-		passwd = md5.digest('hex');
-
-		this.m_url += '&cols=' + columns;
-		this.m_url += '&rows=' + rows;
-		this.m_url += '&user=' + user;
-		this.m_url += '&passwd=' + passwd;
-		if (utils.dev) {
-			process.stdout.write('\n');
-			console.dlog(this.m_url);
-		}
-		this.m_conv = new WSConversation(this.m_url);
-		this.m_conv.onOpen.on(e=>this.m_handle_open());
-		this.m_conv.onClose.on(e=>this.m_handle_close());
-		this.m_conv.onMessage.on(e=>this.m_handle_data(e.data));
-		this.m_conv.onError.on(e=>this.m_handle_error(e.data));
-		this.m_cli = new WSClient('tty', this.m_conv);
-		this.m_cli.addEventListener('Status', e=>this.m_handle_status(e.data));
-		this.m_cli.addEventListener('Exit', e=>this.m_handle_exit(e.data));
+		this.m_user = user;
 
 		process.stdout.write('\nConnecting...\n');
+
+		try {
+			this.m_cli = new (Programs[cmd])(this, this.m_url,
+				{ user, certificate: passwd, role: 'admin', cmd });
+			await this.m_cli._exec(...args);
+		} catch(err) {
+			console.error(err);
+			process.exit(0)
+		}
 	}
 
 }

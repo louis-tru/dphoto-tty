@@ -6,38 +6,49 @@
 
 var utils = require('nxkit');
 var arguments = require('nxkit/arguments');
-var { exec, execSync } = require('nxkit/syscall');
 var { TTYServer } = require('./server');
-var { host = '127.0.0.1', port = 8095, device_id } = utils.config.dttyd || {};
+var req = require('nxkit/request');
+var { host = '127.0.0.1', port = 8096, id, cert } = utils.config.dttyd || {};
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;
 var def_opts = arguments.defOpts;
-var id = getDeviceId() || device_id || '';
+var device_details = null;
 
-function getDeviceId() {
-	var cmd = `cat /proc/cpuinfo | grep Serial | awk {'print $3'}`;
-	var { stdout } = execSync(cmd);
-	return String(stdout[0] || '').trim();
+async function readDevice() {
+	if (!device_details) {
+		device_details = {};
+		var retry = 5;
+		while (--retry) {
+			try {
+				var {data} = await req.get('http://127.0.0.1:8090/service-api/account/details');
+				device_details = JSON.parse(data + '');
+				break;
+			} catch(err) {
+			}
+			await utils.sleep(200);
+		}
+	}
+	return device_details;
 }
 
-def_opts(['help'],        0,   '--help         print help info');
-def_opts(['device', 'd'], id,  '--device, -d   device id [{0}]');
-def_opts(['host', 'h'], host,  '--host, -h     host [{0}]');
-def_opts(['port', 'p'], port,  '--port, -p     port [{0}]');
-def_opts(['ssl'],       0,     '--ssl          use ssl [{0}]');
+async function main() {
+	id = id || (await readDevice()).serialNumber || '';
+	cert = cert || (await readDevice()).deviceId || 'None';
 
-function main() {
+	def_opts(['help'],      0,                 '--help         print help info');
+	def_opts(['id'],        id,                '--id, -id      device id [{0}]');
+	def_opts(['host', 'h'], host,              '--host, -h     host [{0}]');
+	def_opts(['port', 'p'], port,              '--port, -p     port [{0}]');
+	def_opts(['ssl'],       0,                 '--ssl          use ssl [{0}]');
+	def_opts(['cert', 'c'], cert,              '--cert, -c     certificate [{0}]');
 
-	if (opts.help || !opts.device) { // print help info
+	if (opts.help || !opts.id) { // print help info
 		process.stdout.write('Usage: dttyd [VAR=VALUE] \n')
 		process.stdout.write('  ' + help_info.join('\n  ') + '\n');
-		return;
+	} else {
+		new TTYServer(opts);
 	}
-
-	opts.deviceId = opts.device;
-	
-	new TTYServer(opts).start();
 }
 
 main();

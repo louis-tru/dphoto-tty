@@ -21,13 +21,14 @@ function main() {
 		process.stdout.write('  ' + help_info.join('\n  ') + '\n');
 		return;
 	}
-	var [ host, port = 8095 ] = hosts.split(':');
+	var [ host, port = 8096 ] = hosts.split(':');
 
-	opts.deviceId = id;
+	opts.thatId = id;
 	opts.host = host;
 	opts.port = port;
 
-	new TTYClient(opts).start();
+	var cli = new TTYClient(opts);
+	cli.terminal();
 }
 
 main();

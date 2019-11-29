@@ -9,7 +9,7 @@ module.exports = {
 	},
 	dttyd: {
 		host: 'dttyd.stars-mine.com',
-		port: 8095,
-		device_id: 'louis.ubuntu.com',
+		port: 8096,
+		id: '',
 	},
 };
