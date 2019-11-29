@@ -4,9 +4,6 @@
  */
 
 module.exports = {
-	users: {
-		admin: '42f390026b5ed41b5a45a297c3d42e3d',
-	},
 	dttyd: {
 		host: 'dttyd.stars-mine.com',
 		port: 8096,
