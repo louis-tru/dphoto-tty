@@ -22,7 +22,7 @@ async function readDevice() {
 		while (--retry) {
 			try {
 				var {data} = await req.get('http://127.0.0.1:8090/service-api/account/details');
-				device_details = JSON.parse(data + '');
+				device_details = JSON.parse(data + '').data;
 				break;
 			} catch(err) {
 			}
