@@ -1,6 +1,6 @@
 {
 	"name": "dphoto-tty",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"main": "main-tty.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
@@ -9,6 +9,6 @@
 	},
 	"dependencies": {
 		"nxkit": "~0.9.15",
-		"ptyjs2": "~0.3.2"
+		"ptyjs2": "~0.4.0"
 	}
 }
