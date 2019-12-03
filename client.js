@@ -146,10 +146,14 @@ class Forward extends Client {
 				});
 
 				this.conv.onOverflow.on(()=>{
+					if (utils.dev)
+						console.log('Forward.onOverflow', task.id);
 					socket.pause();
 				}, task.id);
 
 				this.conv.onDrain.on(()=>{
+					if (utils.dev)
+						console.log('Forward.onDrain', task.id);
 					socket.resume();
 				}, task.id);
 
