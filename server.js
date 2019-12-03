@@ -24,7 +24,9 @@ class Task {
 		this.host = host;
 		host.addEventListener(`Logout-${sender}`, this.destroy, this, this.id);
 		host.addEventListener('Offline', this.destroy, this, this.id);
-		this.host.m_tasks.set(this.id, this);
+		host.conv.onOverflow.on(this.overflow, this, this.id);
+		host.conv.onDrain.on(this.drain, this, this.id);
+		host.m_tasks.set(this.id, this);
 	}
 
 	destroy(e, trigger) {
@@ -36,12 +38,15 @@ class Task {
 			this.host.m_tasks.delete(this.id);
 			this.host.removeEventListener(`Logout-${this.sender}`, this.id);
 			this.host.removeEventListener(`Offline`, this.id);
+			this.host.conv.onOverflow.off(this.id);
+			this.host.conv.onDrain.off(this.id);
 			console.log('task disconnect', this.sender);
 		}
 	}
 
 	end() {}
-
+	overflow(){}
+	drain(){}
 }
 
 class TerminalTask extends Task {
@@ -54,6 +59,12 @@ class ForwardTask extends Task {
 	end() {
 		if (this.instance.writable)
 			this.instance.end();
+	}
+	overflow() {
+		this.instance.pause();
+	}
+	drain(){
+		this.instance.resume();
 	}
 }
 

@@ -105,6 +105,8 @@ class Forward extends Client {
 					that.send('fend', [task.id]).catch(console.error);
 				if (task.instance.writable)
 					task.instance.end();
+				this.conv.onOverflow.off(task.id);
+				this.conv.onDrain.off(task.id);
 				tasks.delete(task.id);
 			}
 		};
@@ -126,15 +128,30 @@ class Forward extends Client {
 			var task = {instance: socket, activity: true};
 			try {
 				socket.pause();
+
 				task.id = await that.call('forward', {port:forward});
+
 				socket.on('data', data=>{
 					if (task.activity)
 						that.send('fw', [task.id,data]).catch(console.error);
 				});
-				socket.on('end', ()=>end(task));
+
+				socket.on('end', ()=>{
+					end(task);
+				});
+
 				socket.on('error', e=>{
 					console.error(`local socker error, ${task.id}`, e);
 				});
+
+				this.conv.onOverflow.on(()=>{
+					socket.pause();
+				}, task.id);
+
+				this.conv.onDrain.on(()=>{
+					socket.resume();
+				}, task.id);
+
 				socket.resume();
 			} catch(err) {
 				socket.end();
