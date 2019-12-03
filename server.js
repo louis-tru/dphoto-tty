@@ -34,9 +34,9 @@ class Task {
 				this.host.that(this.sender).trigger('End', e.data).catch(console.error);
 			this.end();
 			this.host.m_tasks.delete(this.id);
-			this.removeEventListener(`Logout-${sender}`, this.id);
+			this.removeEventListener(`Logout-${this.sender}`, this.id);
 			this.removeEventListener(`Offline`, this.id);
-			console.log('task disconnect', sender);
+			console.log('task disconnect', this.sender);
 		}
 	}
 
