@@ -142,6 +142,7 @@ class Forward extends Client {
 
 				socket.on('error', e=>{
 					console.error(`local socker error, ${task.id}`, e);
+					end(task);
 				});
 
 				this.conv.onOverflow.on(()=>{
