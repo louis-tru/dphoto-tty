@@ -31,7 +31,7 @@ class Task {
 		if (this.activity) {
 			this.activity = false;
 			if (trigger)
-				that.trigger('End', e.data).catch(console.error);
+				this.host.that(this.sender).trigger('End', e.data).catch(console.error);
 			this.end();
 			this.host.m_tasks.delete(this.id);
 			this.removeEventListener(`Logout-${sender}`, this.id);
