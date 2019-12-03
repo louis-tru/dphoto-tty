@@ -172,9 +172,10 @@ class Client extends cli.FMTClient {
 				resolve(task.id);
 			});
 
-			socket.on('data', (data)=>(
-				task.activity&&that.send('d', [task.id,data]).catch(console.error)
-			));
+			socket.on('data', (data)=>{
+				if (task.activity)
+					that.send('d', [task.id,data]).catch(console.error);
+			});
 			socket.on('end', ()=>task.destroy({data:task.id}, true));
 
 			socket.on('error', e=>{
@@ -197,8 +198,7 @@ class Client extends cli.FMTClient {
 	}
 
 	fend([tid], sender) {
-		var task = this._task(tid, sender);
-		task.destroy({data:tid});
+		this._task(tid, sender).destroy({data:tid});
 	}
 
 }

@@ -10,6 +10,7 @@ var crypto = require('crypto');
 var cli = require('nxkit/fmt/cli');
 var uuid = require('nxkit/hash/uuid');
 var net = require('net');
+var errno = require('./errno');
 
 /**
  * @class Client
@@ -19,7 +20,7 @@ class Client extends cli.FMTClient {
 		return this.m_host.thatId;
 	}
 	constructor(host, ...args) {
-		super(uuid(), ...args);
+		super(utils.hash(uuid()), ...args);
 		this.m_host = host;
 		this.m_that = this.that(host.thatId);
 	}
@@ -78,9 +79,9 @@ class Forward extends Client {
 
 	_task(tid, sender) {
 		var task = this.m_tasks.get(tid);
-		utils.assert(task, errno.ERR_CANNOT_FIND_TASK);
-		utils.assert(this.thatId == sender, errno.ERR_CANNOT_FIND_TASK);
-		return task;
+		if (task && this.thatId == sender) {
+			return task;
+		}
 	}
 
 	/**
@@ -98,7 +99,7 @@ class Forward extends Client {
 		var tasks = this.m_tasks = new Map();
 
 		var end = (task, noSend)=>{
-			if (task.activity) {
+			if (task && task.activity) {
 				task.activity = false;
 				if (!noSend)
 					that.send('fend', [task.id]).catch(console.error);
@@ -121,22 +122,22 @@ class Forward extends Client {
 		this.addEventListener('Offline', offline);
 
 		// listener local port
-		var server = net.createServer(async instance=>{
-			var task = {instance, activity: true};
+		var server = net.createServer(async socket=>{
+			var task = {instance: socket, activity: true};
 			try {
-				instance.pause();
+				socket.pause();
 				task.id = await that.call('forward', {port:forward});
-				instance.on('data', data=>{
+				socket.on('data', data=>{
 					if (task.activity)
 						that.send('fw', [task.id,data]).catch(console.error);
 				});
-				instance.on('end', ()=>end(task));
-				instance.on('error', e=>{
+				socket.on('end', ()=>end(task));
+				socket.on('error', e=>{
 					console.error(`local socker error, ${task.id}`, e);
 				});
-				instance.resume();
+				socket.resume();
 			} catch(err) {
-				instance.end();
+				socket.end();
 			}
 			tasks.set(task.id, task);
 		});
@@ -154,12 +155,15 @@ class Forward extends Client {
 	 * @func d()
 	 */
 	d([tid,data], sender) {
-		this._task(tid, sender).instance.write(data);
+		var task = this._task(tid, sender);
+		if (task)
+			this._task(tid, sender).instance.write(data);
 	}
 
 	err([tid,data], sender) {
 		var task = this._task(tid, sender);
-		console.error(`remote socket error, ${task.id}`, Error.new(data));
+		if (task)
+			console.error(`remote socket error, ${task.id}`, Error.new(data));
 	}
 
 }
