@@ -5,7 +5,7 @@
 
 var utils = require('nxkit');
 var log = require('./log');
-var net = require('./net');
+var net = require('net');
 var cli = require('nxkit/fmt/cli');
 var errno = require('./errno');
 var Terminal = require('./terminal');
