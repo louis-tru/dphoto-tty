@@ -84,6 +84,19 @@ class Forward extends Client {
 		}
 	}
 
+	_end(task, noSend) {
+		if (task && task.activity) {
+			task.activity = false;
+			if (!noSend)
+			this.m_that.send('fend', [task.id]).catch(console.error);
+			if (task.instance.writable)
+				task.instance.end();
+			this.conv.onOverflow.off(task.id);
+			this.conv.onDrain.off(task.id);
+			this.m_tasks.delete(task.id);
+		}
+	};
+
 	/**
 	 * @overwrite
 	 */
@@ -98,19 +111,6 @@ class Forward extends Client {
 		var that = this.m_that;
 		var tasks = this.m_tasks = new Map();
 
-		var end = (task, noSend)=>{
-			if (task && task.activity) {
-				task.activity = false;
-				if (!noSend)
-					that.send('fend', [task.id]).catch(console.error);
-				if (task.instance.writable)
-					task.instance.end();
-				this.conv.onOverflow.off(task.id);
-				this.conv.onDrain.off(task.id);
-				tasks.delete(task.id);
-			}
-		};
-
 		var offline = ()=>{
 			for (var [,task] of this.m_tasks) {
 				if (task.activity)
@@ -119,7 +119,7 @@ class Forward extends Client {
 			tasks.clear();
 		};
 
-		this.addEventListener('End', e=>end(this._task(e.data, e.origin), true));
+		this.addEventListener('End', e=>this._end(this._task(e.data, e.origin), true));
 		this.addEventListener(`Logout-${this.thatId}`, offline);
 		this.addEventListener('Offline', offline);
 
@@ -137,12 +137,12 @@ class Forward extends Client {
 				});
 
 				socket.on('end', ()=>{
-					end(task);
+					this._end(task);
 				});
 
 				socket.on('error', e=>{
 					console.error(`local socker error, ${task.id}`, e);
-					end(task);
+					this._end(task);
 				});
 
 				this.conv.onOverflow.on(()=>{
@@ -180,8 +180,10 @@ class Forward extends Client {
 
 	err([tid,data], sender) {
 		var task = this._task(tid, sender);
-		if (task)
+		if (task) {
 			console.error(`remote socket error, ${task.id}`, Error.new(data));
+			this._end(task);
+		}
 	}
 
 }
