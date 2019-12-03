@@ -5,10 +5,57 @@
 
 var utils = require('nxkit');
 var log = require('./log');
+var net = require('./net');
 var cli = require('nxkit/fmt/cli');
 var errno = require('./errno');
 var Terminal = require('./terminal');
 var req = require('nxkit/request');
+
+/**
+ * @class Task
+ */
+class Task {
+
+	constructor(host, sender, instance) {
+		this.activity = true;
+		this.sender = sender;
+		this.id = utils.id;
+		this.instance = instance;
+		this.host = host;
+		host.addEventListener(`Logout-${sender}`, this.destroy, this, this.id);
+		host.addEventListener('Offline', this.destroy, this, this.id);
+		this.host.m_tasks.set(this.id, this);
+	}
+
+	destroy(e, trigger) {
+		if (this.activity) {
+			this.activity = false;
+			if (trigger)
+				that.trigger('End', e.data).catch(console.error);
+			this.end();
+			this.host.m_tasks.delete(this.id);
+			this.removeEventListener(`Logout-${sender}`, this.id);
+			this.removeEventListener(`Offline`, this.id);
+			console.log('task disconnect', sender);
+		}
+	}
+
+	end() {}
+
+}
+
+class TerminalTask extends Task {
+	end() {
+		this.instance.kill(0, 1);
+	}
+}
+
+class ForwardTask extends Task {
+	end() {
+		if (this.instance.writable)
+			this.instance.end();
+	}
+}
 
 /**
  * @class Client
@@ -18,78 +65,41 @@ class Client extends cli.FMTClient {
 	constructor(host, ...args) {
 		super(...args);
 		this.m_host = host;
-		this.m_terminals = new Map();
+		this.m_tasks = new Map();
+		this._checkOffline().catch(console.error);;
 	}
 
-	_getTerminal(tid, sender) {
-		var o = this.m_terminals.get(tid);
-		utils.assert(o, errno.ERR_CANNOT_FIND_TERMINAL);
-		utils.assert(o.sender == sender, errno.ERR_CANNOT_FIND_TERMINAL);
-		return o.term;
-	}
-
-	/**
-	 * @func terminal() new terminal
-	 */
-	terminal({ columns, rows }, sender) {
-		utils.assert(sender);
-
-		var tid = utils.id;
-		var term = new Terminal(columns, rows);
-		var activity = true;
-		var that = this.that(sender);
-
-		var offline = (e, trigger)=>{
-			if (activity) {
-				activity = false;
-				if (trigger)
-					that.trigger('Exit', e.data).catch(console.error);
-				term.kill(0, 1);
-				this.m_terminals.delete(tid);
-				this.removeEventListener(`Logout-${sender}`, offline);
-				this.removeEventListener(`Offline`, offline);
-				console.log('terminal disconnect', sender);
-			}
-		};
-		term.addEventListener('Data', e=>{
-			if (activity)
-				that.trigger('Data', e.data).catch(console.error);
-		});
-		term.addEventListener('Exit', e=>offline(e, 1));
-		this.addEventListener(`Logout-${sender}`, offline);
-		this.addEventListener('Offline', offline);
-
-		this.m_terminals.set(tid, { sender, term });
-
+	async _checkOffline() {
 		// test offline status
-		(async ()=>{
-			while (activity) {
-				await utils.sleep(3e4); // 30s
+		while (true) {
+			await utils.sleep(3e4); // 30s
+
+			var senders = new Map();
+			for (var [id, task] of this.m_tasks) {
+				var tasks = senders.get(task.sender);
+				if (!tasks) {
+					senders.set(task.sender, tasks = []);
+				}
+				tasks.push(task);
+			}
+
+			for (var [sender, tasks] of senders) {
 				try {
-					if (! await that.hasOnline()) {
-						offline();
+					if (! await this.that(sender).hasOnline() ) {
+						tasks.forEach(e=>e.destroy());
 					}
 				} catch(err) {
-					offline();
+					tasks.forEach(e=>e.destroy());
 				}
 			}
-		})().catch(console.error);
-
-		console.log('terminal connect', sender);
-
-		return tid;
+		}
 	}
 
-	terminalResize({tid, columns, rows }, sender) {
-		this._getTerminal(tid, sender).resize(columns, rows);
-	}
-
-	terminalKill({tid,code=0}, sender) {
-		this._getTerminal(tid, sender).kill(code);
-	}
-
-	terminalWrite([tid,data], sender) {
-		this._getTerminal(tid, sender).write(data);
+	_task(id, sender) {
+		var task = this.m_tasks.get(id);
+		utils.assert(task, errno.ERR_CANNOT_FIND_TASK);
+		utils.assert(task.sender == sender, errno.ERR_CANNOT_FIND_TASK);
+		return task;
 	}
 
 	/**
@@ -102,6 +112,95 @@ class Client extends cli.FMTClient {
 		});
 		return [data.statusCode, data.headers, data.data];
 	}
+
+	// terminal
+
+	/**
+	 * @func terminal() new terminal
+	 */
+	terminal({ columns, rows }, sender) {
+		utils.assert(sender);
+
+		var that = this.that(sender);
+		var task = new TerminalTask(this, sender, new Terminal(columns, rows));
+
+		task.instance.addEventListener('Data', e=>{
+			if (task.activity)
+				that.trigger('Data', e.data).catch(console.error);
+		});
+		task.instance.addEventListener('Exit', e=>task.destroy(e, true));
+
+		console.log('terminal connect', sender);
+
+		return task.id;
+	}
+
+	/**
+	 * @func tresize() terminal resize
+	 */
+	tresize({tid, columns, rows }, sender) {
+		this._task(tid, sender).instance.resize(columns, rows);
+	}
+
+	/**
+	 * @func tkill() terminal kill
+	 */
+	tkill({tid,code=0}, sender) {
+		this._task(tid, sender).instance.kill(code);
+	}
+
+	/**
+	 * @func twrite() terminal write
+	 */
+	twrite([tid,data], sender) {
+		this._task(tid, sender).instance.write(data);
+	}
+
+	// forward
+
+	/**
+	 * @func forward() forward port connect
+	 */
+	forward({port}, sender) {
+		utils.assert(sender);
+		return new Promise((resolve, reject)=>{
+
+			var that = this.that(sender), task;
+
+			var socket = net.createConnection({ port }, ()=>{
+				task = new ForwardTask(this, sender, socket);
+				resolve(task.id);
+			});
+
+			socket.on('data', (data)=>(
+				task.activity&&that.send('d', [task.id,data]).catch(console.error)
+			));
+			socket.on('end', ()=>task.destroy({data:task.id}, true));
+
+			socket.on('error', e=>{
+				if (task) {
+					that.send('err', [task.id,e]).catch(console.error);
+				} else {
+					reject(e);
+				}
+			});
+
+			console.log('forward connect', sender);
+		});
+	}
+
+	/**
+	 * @func fw() forward write
+	 */
+	fw([tid,data], sender) {
+		this._task(tid, sender).instance.write(data);
+	}
+
+	fend([tid], sender) {
+		var task = this._task(tid, sender);
+		task.destroy({data:tid});
+	}
+
 }
 
 /**

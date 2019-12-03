@@ -9,7 +9,7 @@ var readline = require('readline');
 var crypto = require('crypto');
 var cli = require('nxkit/fmt/cli');
 var uuid = require('nxkit/hash/uuid');
-// var errno = require('./errno');
+var net = require('net');
 
 /**
  * @class Client
@@ -34,7 +34,7 @@ class Terminal extends Client {
 	 * @overwrite
 	 */
 	async _exec() {
-		await this.subscribe(['Data','Exit']);
+		await this.subscribe(['Data','End']);
 
 		var getSize = ()=>({ 
 			rows: process.stdout.rows, columns: process.stdout.columns 
@@ -47,7 +47,7 @@ class Terminal extends Client {
 		};
 
 		this.addEventListener('Data', e=>process.stdout.write(e.data));
-		this.addEventListener('Exit', offline);
+		this.addEventListener('End', offline);
 		this.addEventListener(`Logout-${this.thatId}`, offline);
 		this.addEventListener('Offline', offline);
 
@@ -55,11 +55,11 @@ class Terminal extends Client {
 		var tid = await that.call('terminal', getSize());
 
 		process.stdout.on('resize', e=>{
-			that.call('terminalResize', {tid, ...getSize() }).catch(console.error);
+			that.call('tresize', {tid, ...getSize() }).catch(console.error);
 		});
 		process.stdin.on('data', async e=>{
 			try {
-				await that.call('terminalWrite', [tid,e]);
+				await that.call('twrite', [tid,e]);
 			} catch(err) {
 				console.log(err);
 				offline();
@@ -71,8 +71,102 @@ class Terminal extends Client {
 	}
 }
 
+/**
+ * @class Forward
+ */
+class Forward extends Client {
+
+	_task(tid, sender) {
+		var task = this.m_tasks.get(tid);
+		utils.assert(task, errno.ERR_CANNOT_FIND_TASK);
+		utils.assert(this.thatId == sender, errno.ERR_CANNOT_FIND_TASK);
+		return task;
+	}
+
+	/**
+	 * @overwrite
+	 */
+	async _exec({ forward, port }) {
+		forward = Number(forward) || 0;
+		port = Number(port) || 0;
+		utils.assert(forward > 0 && forward < 65536);
+		utils.assert(port > 0 && port < 65536);
+
+		await this.subscribe(['End']);
+
+		var that = this.m_that;
+		var tasks = this.m_tasks = new Map();
+
+		var end = (task, noSend)=>{
+			if (task.activity) {
+				task.activity = false;
+				if (!noSend)
+					that.send('fend', [task.id]).catch(console.error);
+				if (task.instance.writable)
+					task.instance.end();
+				tasks.delete(task.id);
+			}
+		};
+
+		var offline = ()=>{
+			for (var [,task] of this.m_tasks) {
+				if (task.activity)
+					task.instance.end(); // end all socket connect
+			}
+			tasks.clear();
+		};
+
+		this.addEventListener('End', e=>end(this._task(e.data, e.origin), true));
+		this.addEventListener(`Logout-${this.thatId}`, offline);
+		this.addEventListener('Offline', offline);
+
+		// listener local port
+		var server = net.createServer(async instance=>{
+			var task = {instance, activity: true};
+			try {
+				instance.pause();
+				task.id = await that.call('forward', {port:forward});
+				instance.on('data', data=>{
+					if (task.activity)
+						that.send('fw', [task.id,data]).catch(console.error);
+				});
+				instance.on('end', ()=>end(task));
+				instance.on('error', e=>{
+					console.error(`local socker error, ${task.id}`, e);
+				});
+				instance.resume();
+			} catch(err) {
+				instance.end();
+			}
+			tasks.set(task.id, task);
+		});
+
+		server.on('error', (err) => {
+			throw err;
+		});
+
+		server.listen(port, ()=>{
+			console.log(`remote device port forward, remote ${forward} to local ${port}`);
+		});
+	}
+
+	/**
+	 * @func d()
+	 */
+	d([tid,data], sender) {
+		this._task(tid, sender).instance.write(data);
+	}
+
+	err([tid,data], sender) {
+		var task = this._task(tid, sender);
+		console.error(`remote socket error, ${task.id}`, Error.new(data));
+	}
+
+}
+
 const Programs = {
 	terminal: Terminal,
+	forward: Forward,
 };
 
 /**
@@ -92,10 +186,10 @@ class TTYClient {
 		return this.m_thatId;
 	}
 
-	constructor({ host = '127.0.0.1', port = 8095, ssl = false, thatId = '' }) {
+	constructor({ serverHost = '127.0.0.1', serverPort = 8096, ssl = false, thatId = '' }) {
 		utils.assert(thatId);
 		this.m_user = '';
-		this.m_url = `fmt${ssl?'s':''}://${host}:${port}/`;
+		this.m_url = `fmt${ssl?'s':''}://${serverHost}:${serverPort}/`;
 		this.m_thatId = thatId;
 		this.m_cli = null;
 	}
@@ -105,6 +199,10 @@ class TTYClient {
 	 */
 	terminal() {
 		this._run('terminal').catch(console.error);
+	}
+
+	forward(options) {
+		this._run('forward', options).catch(console.error);
 	}
 
 	async _run(cmd, ...args) {
