@@ -185,7 +185,7 @@ class Forward extends Client {
 	err([tid,data], sender) {
 		var task = this._task(tid, sender);
 		if (task) {
-			console.error(`remote socket error, ${task.id}`, Error.new(data));
+			console.error(`remote socket error, ${task.id}`, data);
 			// this._end(task);
 		}
 	}
