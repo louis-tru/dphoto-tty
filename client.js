@@ -306,7 +306,6 @@ class TTYClient {
 				{ user, certificate: passwd, role: 'admin', cmd });
 			await this.m_cli._exec(...args);
 		} catch(err) {
-			console.error(err);
 			process.exit(0)
 		}
 	}
