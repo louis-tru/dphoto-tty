@@ -179,8 +179,11 @@ class Forward extends Client {
 	 */
 	d([tid,data], sender) {
 		var task = this._task(tid, sender);
-		if (task)
+		if (task) {
 			this._task(tid, sender).instance.write(data);
+		} else {
+			console.warn(`Useless data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
+		}
 	}
 
 	err([tid,data], sender) {
@@ -188,6 +191,8 @@ class Forward extends Client {
 		if (task) {
 			console.error(`remote socket error, ${task.id}`, data);
 			// this._end(task);
+		} else {
+			console.warn(`Useless err data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
 		}
 	}
 
