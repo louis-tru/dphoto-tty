@@ -137,6 +137,7 @@ class Forward extends Client {
 				});
 
 				socket.on('end', ()=>{
+					console.error(`local socker end, ${task.id}`);
 					this._end(task);
 				});
 
