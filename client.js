@@ -47,7 +47,7 @@ class Terminal extends Client {
 			});
 		};
 
-		this.addEventListener('Data', e=>process.stdout.write(e.data));
+		// this.addEventListener('Data', e=>process.stdout.write(e.data));
 		this.addEventListener('End', offline);
 		this.addEventListener(`Logout-${this.thatId}`, offline);
 		this.addEventListener('Offline', offline);
@@ -62,7 +62,7 @@ class Terminal extends Client {
 			try {
 				await that.call('twrite', [tid,e]);
 			} catch(err) {
-				console.log(err);
+				console.error(err);
 				offline();
 			}
 		});
@@ -70,6 +70,15 @@ class Terminal extends Client {
 		process.stdin.setRawMode(true);
 		process.stdin.resume();
 	}
+
+	/**
+	 * @func d()
+	 */
+	d([data], sender) {
+		if (this.thatId == sender)
+			process.stdout.write(data);
+	}
+
 }
 
 /**

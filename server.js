@@ -117,6 +117,13 @@ class Client extends cli.FMTClient {
 		return task;
 	}
 
+	_taskNoErr(id, sender) {
+		var task = this.m_tasks.get(id);
+		if (task && task.sender == sender) {
+			return task;
+		}
+	}
+
 	/**
 	 * @func dmagic() request magic service
 	 */
@@ -142,7 +149,8 @@ class Client extends cli.FMTClient {
 
 		task.instance.addEventListener('Data', e=>{
 			if (task.activity)
-				that.trigger('Data', e.data).catch(console.error);
+				// that.trigger('Data', e.data).catch(console.error);
+				that.send('d', [e.data]).catch(console.error);
 		});
 		task.instance.addEventListener('Exit', e=>task.destroy(e, true));
 
@@ -214,11 +222,21 @@ class Client extends cli.FMTClient {
 	 * @func fw() forward write
 	 */
 	fw([tid,data], sender) {
-		this._task(tid, sender).instance.write(data);
+		var task = this._taskNoErr(tid, sender);
+		if (task) {
+			task.instance.write(data);
+		} else {
+			console.warn(`Useless data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
+		}
 	}
 
 	fend([tid], sender) {
-		this._task(tid, sender).destroy({data:tid});
+		var task = this._taskNoErr(tid, sender);
+		if (task) {
+			this._task(tid, sender).destroy({data:tid});
+		} else {
+			console.warn(`Useless fend, tid: ${tid}, sender: ${sender}`);
+		}
 	}
 
 }
