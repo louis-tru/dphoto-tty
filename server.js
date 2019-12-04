@@ -120,7 +120,7 @@ class Client extends cli.FMTClient {
 	/**
 	 * @func dmagic() request magic service
 	 */
-	async dmagic([name,params,headers]) {
+	async dmagic([name,params,headers], sender) {
 		var host = '127.0.0.1';
 		var data = await req.post(`http://${host}:8091/service-api/${name}`, {
 			params, headers: { ...headers, unsafe: 1},
@@ -133,9 +133,10 @@ class Client extends cli.FMTClient {
 	/**
 	 * @func terminal() new terminal
 	 */
-	terminal({ columns, rows }, sender) {
+	async terminal({ columns, rows }, sender) {
 		utils.assert(sender);
-
+		var senderInfo = await this.user(sender);
+		utils.assert(senderInfo.role == 'admin', errno.ERR_NOT_PERMISSION);
 		var that = this.that(sender);
 		var task = new TerminalTask(this, sender, new Terminal(columns, rows));
 
@@ -176,23 +177,25 @@ class Client extends cli.FMTClient {
 	/**
 	 * @func forward() forward port connect
 	 */
-	forward({port}, sender) {
+	async forward({port}, sender) {
 		utils.assert(sender);
-		return new Promise((resolve, reject)=>{
+		var senderInfo = await this.user(sender);
+		utils.assert(senderInfo.role == 'admin', errno.ERR_NOT_PERMISSION);
+		var that = this.that(sender), task;
 
-			var that = this.that(sender), task;
+		return await new Promise((resolve, reject)=>{
 
 			var socket = net.createConnection({ port }, ()=>{
 				task = new ForwardTask(this, sender, socket);
 				resolve(task.id);
 			});
-
 			socket.on('data', (data)=>{
 				if (task.activity)
 					that.send('d', [task.id,data]).catch(console.error);
 			});
-			socket.on('end', ()=>task.destroy({data:task.id}, true));
-
+			socket.on('end', ()=>
+				task.destroy({data:task.id}, true)
+			);
 			socket.on('error', e=>{
 				if (task) {
 					that.send('err', [task.id,e]).catch(console.error);

@@ -5,4 +5,5 @@
 
 module.exports = {
 	ERR_CANNOT_FIND_TASK: [200001, 'CANNOT FIND TASK'],
+	ERR_NOT_PERMISSION: [200002, 'Not Permission'],
 };
