@@ -8,9 +8,6 @@ var paths = require('./paths');
 var log = require('nxkit/log');
 
 if (!utils.dev || utils.options.caught_exception) {
-
-	console.log('BA')
-
 	process.on('uncaughtException', function(err) {
 		console.error(err);
 	});
