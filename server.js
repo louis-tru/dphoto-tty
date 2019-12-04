@@ -198,7 +198,8 @@ class Client extends cli.FMTClient {
 			);
 			socket.on('error', e=>{
 				if (task) {
-					that.send('err', [task.id,e]).catch(console.error);
+					// that.send('err', [task.id,e]).catch(console.error);
+					console.error(`remote socker error, ${task.id}`, e);
 				} else {
 					reject(e);
 				}
