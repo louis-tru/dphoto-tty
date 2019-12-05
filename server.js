@@ -202,7 +202,7 @@ class Client extends cli.FMTClient {
 					that.send('d', [task.id,data]).catch(console.error);
 			});
 			socket.on('end', ()=>{
-				console.log(`remote socker end, ${task.id}`);
+				console.log(`remote socket end, ${task.id}`);
 				task.destroy({data:task.id}, true)
 			});
 			socket.on('error', e=>{

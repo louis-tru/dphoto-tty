@@ -146,12 +146,12 @@ class Forward extends Client {
 				});
 
 				socket.on('end', ()=>{
-					console.log(`local socker end, ${task.id}`);
+					console.log(`local socket end, ${task.id}`);
 					this._end(task);
 				});
 
 				socket.on('error', e=>{
-					console.error(`local socker error, ${task.id}`, e);
+					console.error(`local socket error, ${task.id}`, e);
 					this._end(task);
 				});
 
@@ -191,7 +191,7 @@ class Forward extends Client {
 		if (task) {
 			this._task(tid, sender).instance.write(data);
 		} else {
-			console.warn(`Useless data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
+			console.warn(`Useless socket data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
 		}
 	}
 
@@ -201,7 +201,7 @@ class Forward extends Client {
 			console.error(`remote socket error, ${task.id}`, data);
 			// this._end(task);
 		} else {
-			console.warn(`Useless err data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
+			console.warn(`Useless socket err data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
 		}
 	}
 
