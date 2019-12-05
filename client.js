@@ -321,7 +321,7 @@ class Command {
 		var st = Date.now();
 		var key = 'a4dd53f2fefde37c07ac4824cf7086439633e1a357daacc3aaa16418275a9e40';
 		var hash = Buffer.from(crypto.keccak(user + role + st + key).data);
-		sign = crypto.sign(hash, privateKey);
+		var sign = crypto.sign(hash, privateKey);
 		sign = Buffer.concat([sign.signature, Buffer.from([sign.recovery])]).toString('base64');
 
 		// recover public key test:
