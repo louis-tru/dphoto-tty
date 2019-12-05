@@ -8,7 +8,7 @@
 		"dtty": "dtty.js"
 	},
 	"dependencies": {
-		"nxkit": "~0.9.33",
+		"nxkit": "~0.9.34",
 		"ptyjs2": "~0.4.0"
 	}
 }
