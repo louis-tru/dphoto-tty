@@ -12,6 +12,8 @@ var uuid = require('nxkit/hash/uuid');
 var net = require('net');
 var errno = require('./errno');
 
+// require('nxkit/ws/conv').USE_GZIP_DATA = false;
+
 /**
  * @class Client
  */

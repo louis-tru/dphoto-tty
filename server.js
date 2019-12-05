@@ -11,6 +11,8 @@ var errno = require('./errno');
 var Terminal = require('./terminal');
 var req = require('nxkit/request');
 
+require('nxkit/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close gzip
+
 /**
  * @class Task
  */
