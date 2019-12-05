@@ -16,7 +16,7 @@ var fs = require('nxkit/fs');
 var keys = require('nxkit/keys');
 var path = require('path');
 
-// require('nxkit/ws/conv').USE_GZIP_DATA = false;
+require('nxkit/ws/conv').USE_GZIP_DATA = true;
 
 const PRIVATE_KEY_FILE = `${process.env.HOME}/.dtty/privateKey`;
 
