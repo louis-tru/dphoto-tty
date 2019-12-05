@@ -5,7 +5,7 @@
  */
 
 var arguments = require('nxkit/arguments');
-var { TTYClient } = require('./client');
+var { Command } = require('./client');
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;
@@ -15,8 +15,16 @@ def_opts(['help', 'h'],       0,   '--help, -h         print help info');
 def_opts(['ssl'],             0,   '--ssl              use ssl [{0}]');
 def_opts(['forward', 'f'],    0,   '--forward -f       forward remote port to local [{0}]');
 def_opts(['port', 'p'],       0,   '--port -p          local port [{0}]');
+def_opts(['gen', 'G'],        0,   '--gen -G           gen key pair [{0}]');
+def_opts(['force', 'F'],      0,   '--force -F       force exec [{0}]');
 
 function main() {
+	var cmd = new Command();
+
+	if (opts.gen) {
+		return cmd.genkeyPair(opts);
+	}
+
 	var [ id, hosts ] = String(process.argv[2] || '').split('@');
 	if (opts.help || !id || !hosts) {
 		process.stdout.write('Usage:\n  dtty device_id@host[:port] [-ssl]\n');
@@ -29,13 +37,11 @@ function main() {
 	opts.serverHost = serverHost;
 	opts.serverPort = serverPort;
 
-	var cli = new TTYClient(opts);
-
 	if (opts.forward) {
 		opts.port = opts.port || opts.forward;
-		cli.forward(opts);
+		cmd.forward(opts);
 	} else {
-		cli.terminal(opts);
+		cmd.terminal(opts);
 	}
 }
 

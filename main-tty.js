@@ -4,6 +4,6 @@
  */
 
 var { TTYServer } = require('./server');
-var { TTYClient } = require('./client');
+var { Command } = require('./client');
 
-module.exports = { TTYServer, TTYClient };
+module.exports = { TTYServer, Command };

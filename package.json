@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"nxkit": "~0.9.34",
-		"ptyjs2": "~0.4.0"
+		"ptyjs2": "~0.4.0",
+		"crypto-tx": "~0.1.45"
 	}
 }
