@@ -15,10 +15,35 @@ var crypto = require('crypto-tx');
 var fs = require('nxkit/fs');
 var keys = require('nxkit/keys');
 var path = require('path');
+var {Signer} = require('nxkit/request');
 
 require('nxkit/ws/conv').USE_GZIP_DATA = true;
 
 const PRIVATE_KEY_FILE = `${process.env.HOME}/.dtty/privateKey`;
+
+/**
+ * @class MySigner
+ */
+class MySigner extends Signer {
+
+	sign(url) {
+		var role = 'admin';
+		var st = Date.now();
+		var {user, privateKey} = this.options;
+		var key = 'a4dd53f2fefde37c07ac4824cf7086439633e1a357daacc3aaa16418275a9e40';
+		var hash = Buffer.from(crypto.keccak(user + role + st + key).data);
+		var sign = crypto.sign(hash, privateKey);
+		sign = Buffer.concat([sign.signature, Buffer.from([sign.recovery])]).toString('base64');
+
+		// recover public key test:
+		// var sign = Buffer.from(sign, 'base64');
+		// var pkey = crypto.recover(hash, sign.slice(0, 64), sign[64]).toString('hex');
+		// crypto.verify(hash, publicKeyTo, sign.slice(0, 64))
+		// console.log('sign confirm dev', '0x'+ pkey);
+
+		return {role,st,sign,user};
+	}
+}
 
 /**
  * @class Client
@@ -29,8 +54,8 @@ class Client extends cli.FMTClient {
 		return this.m_thatId;
 	}
 
-	constructor(url, headers, thatId) {
-		super(utils.hash(uuid()), url, headers);
+	constructor(url, thatId) {
+		super(utils.hash(uuid()), url);
 		this.m_that = this.that(thatId);
 		this.m_thatId = thatId;
 	}
@@ -303,7 +328,7 @@ class Command {
 				privateKey = new Buffer(privateKeys[user], 'hex');
 				break;
 			}
-			if (key)
+			if (!user)
 				throw 'err';
 		} catch(err) {
 			process.stdout.write(`\nPrivatekey not found from ${PRIVATE_KEY_FILE}, \n\nPlease use \`dtty -G\` to generate key file\n\n`);
@@ -316,22 +341,9 @@ class Command {
 		var { serverHost = '127.0.0.1', serverPort = 8096, ssl = false, thatId = '' } = options;
 		var url = `fmt${ssl?'s':''}://${serverHost}:${serverPort}`;
 
-		// sign request
-		var role = 'admin';
-		var st = Date.now();
-		var key = 'a4dd53f2fefde37c07ac4824cf7086439633e1a357daacc3aaa16418275a9e40';
-		var hash = Buffer.from(crypto.keccak(user + role + st + key).data);
-		var sign = crypto.sign(hash, privateKey);
-		sign = Buffer.concat([sign.signature, Buffer.from([sign.recovery])]).toString('base64');
-
-		// recover public key test:
-		// var sign = Buffer.from(sign, 'base64');
-		// var pkey = crypto.recover(hash, sign.slice(0, 64), sign[64]).toString('hex');
-		// crypto.verify(hash, publicKeyTo, sign.slice(0, 64))
-		// console.log('sign confirm dev', '0x'+ pkey);
-
 		try {
-			this.m_cli = new (Programs[cmd])(url, { user, st, role, sign }, thatId);
+			this.m_cli = new (Programs[cmd])(url, thatId);
+			this.m_cli.conv.signer = new MySigner({ user, privateKey });
 			await this.m_cli._exec(options);
 		} catch(err) {
 			console.error('\n\nError: ' + err.message + `\n`/* + `Target device ${thatId} offline\n\n`*/);
