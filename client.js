@@ -334,7 +334,8 @@ class Command {
 			this.m_cli = new (Programs[cmd])(url, { user, st, role, sign }, thatId);
 			await this.m_cli._exec(options);
 		} catch(err) {
-			process.exit(0)
+			console.error('\n\nError: ' + err.message + `\n`/* + `Target device ${thatId} offline\n\n`*/);
+			process.exit(0);
 		}
 	}
 
