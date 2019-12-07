@@ -54,10 +54,16 @@ class Client extends cli.FMTClient {
 		return this.m_thatId;
 	}
 
-	constructor(url, thatId) {
-		super(utils.hash(uuid()), url);
-		this.m_that = this.that(thatId);
-		this.m_thatId = thatId;
+	constructor(url, thatid) {
+		super(utils.hash(uuid()), url, { thatid });
+		this.m_thatId = null;
+	}
+
+	async getFullThatId() {
+		var {fullThatId} = await this.user();
+		utils.assert(fullThatId);
+		this.m_thatId = fullThatId;
+		this.m_that = this.that(fullThatId);
 	}
 
 	_exec() {}
@@ -340,12 +346,13 @@ class Command {
 
 		var { serverHost = '127.0.0.1', serverPort = 8096, ssl = false, thatId = '' } = options;
 		var url = `fmt${ssl?'s':''}://${serverHost}:${serverPort}`;
-
 		try {
 			this.m_cli = new (Programs[cmd])(url, thatId);
 			this.m_cli.conv.signer = new MySigner({ user, privateKey });
+			await this.m_cli.getFullThatId();
 			await this.m_cli._exec(options);
 		} catch(err) {
+			// throw err;
 			console.error('\n\nError: ' + err.message + `\n`/* + `Target device ${thatId} offline\n\n`*/);
 			process.exit(0);
 		}
