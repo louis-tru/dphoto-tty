@@ -1,6 +1,6 @@
 {
 	"name": "dphoto-tty",
-	"version": "0.2.12",
+	"version": "0.2.13",
 	"main": "main-tty.js",
 	"author": "louistru@hotmail.com",
 	"bin": {

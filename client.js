@@ -354,6 +354,10 @@ class Command {
 		} catch(err) {
 			// throw err;
 			console.error('\n\nError: ' + err.message + `\n`/* + `Target device ${thatId} offline\n\n`*/);
+			if (err.code == -30004) {
+				// Connection disconnection
+				console.warn('\nPlease check whether the local time is synchronized correctly or whether the public key is uploaded\n');
+			}
 			process.exit(0);
 		}
 	}
