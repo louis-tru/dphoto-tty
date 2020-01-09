@@ -3,17 +3,17 @@
  * @date 2018-11-05
  */
 
-var utils = require('nxkit');
+var utils = require('nxkit').default;
 var log = require('./log');
 var readline = require('readline');
 var crypto = require('crypto');
 var cli = require('nxkit/fmt/cli');
-var uuid = require('nxkit/hash/uuid');
+var uuid = require('nxkit/hash/uuid').default;
 var net = require('net');
 var errno = require('./errno');
 var crypto = require('crypto-tx');
 var fs = require('nxkit/fs');
-var keys = require('nxkit/keys');
+var keys = require('nxkit/keys').default;
 var path = require('path');
 var {Signer} = require('nxkit/request');
 
@@ -354,7 +354,7 @@ class Command {
 		} catch(err) {
 			// throw err;
 			console.error('\n\nError: ' + err.message + `\n`/* + `Target device ${thatId} offline\n\n`*/);
-			if (err.code == -30004) {
+			if (err.errno == -30004) {
 				// Connection disconnection
 				console.warn('\nPlease check whether the local time is synchronized correctly or whether the public key is uploaded\n');
 			}

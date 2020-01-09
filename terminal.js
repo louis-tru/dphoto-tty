@@ -3,7 +3,7 @@
  * @date 2019-11-127
  */
 
-var utils = require('nxkit');
+var utils = require('nxkit').default;
 var pty = require('ptyjs2');
 var log = require('./log');
 var {Notification} = require('nxkit/event');

@@ -7,7 +7,7 @@
 var utils = require('nxkit');
 var arguments = require('nxkit/arguments');
 var { TTYServer } = require('./server');
-var req = require('nxkit/request');
+var req = require('nxkit/request').default;
 var { host = '127.0.0.1', port = 8096, id, cert } = utils.config.dttyd || {};
 
 var opts = arguments.options;
