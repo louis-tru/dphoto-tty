@@ -17,4 +17,3 @@ if (!utils.dev || utils.options.caught_exception) {
 }
 
 new log.Console(paths.var + '/log.txt').makeDefault();
-

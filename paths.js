@@ -3,8 +3,10 @@
  * @date 2018-11-05
  */
 
+var utils = require('nxkit').default;
 var fs = require('nxkit/fs');
-var variable = __dirname + '/var';
+var dphoto_magic = String(utils.config.temp) || '/mnt/dphotos/dphoto-tty';
+var variable = dphoto_magic + '/var';
 
 fs.mkdir_p_sync(variable);
 fs.writeFileSync(`${variable}/pid`, process.pid);
