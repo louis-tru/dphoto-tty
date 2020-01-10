@@ -4,7 +4,7 @@
  * @date 2018-11-05
  */
 
-var utils = require('nxkit');
+var utils = require('nxkit').default;
 var arguments = require('nxkit/arguments');
 var { TTYServer } = require('./server');
 var req = require('nxkit/request').default;
