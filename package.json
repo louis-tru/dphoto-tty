@@ -8,7 +8,7 @@
 		"dtty": "dtty.js"
 	},
 	"dependencies": {
-		"nxkit": "~0.10.19",
+		"nxkit": "~0.10.20",
 		"ptyjs2": "~0.4.1",
 		"crypto-tx": "~0.2.2"
 	}
