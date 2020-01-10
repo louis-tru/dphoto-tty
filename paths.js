@@ -5,7 +5,7 @@
 
 var utils = require('nxkit').default;
 var fs = require('nxkit/fs');
-var dphoto_tty = String(utils.config.temp) || '/mnt/dphotos/dphoto-tty';
+var dphoto_tty = utils.config.temp || '/mnt/dphotos/dphoto-tty';
 var variable = dphoto_tty + '/var';
 
 fs.mkdir_p_sync(variable);
