@@ -27,7 +27,7 @@ fi
 install:
 	npm install --unsafe-perm
 	$(SUDO) npm i -g --unsafe-perm
-	@$(call lc_link,$(NGUI)/libs/nxkit)
+	@$(call lc_link,$(NGUI)/libs/nxkit/out/nxkit)
 	@$(call lc_link,$(CWD)/../crypto-tx)
 
 install_dttyd: install
