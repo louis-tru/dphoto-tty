@@ -142,8 +142,8 @@ class Forward extends Client {
 			this.m_that.send('fend', [task.id]).catch(console.error);
 			if (task.instance.writable)
 				task.instance.end();
-			this.conv.onOverflow.off(task.id);
-			this.conv.onDrain.off(task.id);
+			this.conv.onOverflow.off(String(task.id));
+			this.conv.onDrain.off(String(task.id));
 			this.m_tasks.delete(task.id);
 		}
 	};
