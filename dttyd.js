@@ -7,34 +7,58 @@
 var utils = require('nxkit').default;
 var arguments = require('nxkit/arguments');
 var { TTYServer } = require('./server');
-var req = require('nxkit/request').default;
+var { execSync } = require('nxkit/syscall');
+var paths = require('./paths');
 var { host = '127.0.0.1', port = 8096, id, cert } = utils.config.dttyd || {};
+var errno = require('./errno');
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;
 var def_opts = arguments.defOpts;
-var device_details = null;
+var __device_id, __serial_number;
 
-async function readDevice() {
-	if (!device_details) {
-		device_details = {};
-		var retry = 5;
-		while (--retry) {
-			try {
-				var {data} = await req.get('http://127.0.0.1:8090/service-api/account/details');
-				device_details = JSON.parse(data + '').data;
-				break;
-			} catch(err) {
+function getDeviceId() {
+	if (!__device_id) {
+		try {
+			var cmd = `cat /proc/cpuinfo | grep Serial | awk {'print $3'}`;
+			var { first } = execSync(cmd);
+			__device_id = String(first || '').trim();
+		} catch(e) {
+			console.error(e);
+		}
+		if (!__device_id) {
+			if (fs.existsSync(paths.var + '/device_id')) {
+				__device_id = fs.readFileSync(paths.var + '/device_id', 'utf-8').trim();
+			} else {
+				throw Error.new(errno.ERR_UNABLE_TO_READ_DEVICE_ID);
 			}
-			await utils.sleep(200);
 		}
 	}
-	return device_details;
+	return __device_id;
+}
+
+function getSerialNumber() {
+	if (!__serial_number) {
+		try {
+			var cmd = `cat /proc/cpuinfo | grep SN | awk {'print $3'}`;
+			var { first } = execSync(cmd);
+			__serial_number = String(first || '').slice(0, 20);
+			for (var i = 0; i < __serial_number.length; i++) {
+				if (__serial_number.charCodeAt(i) > 127) { // 非法字符
+					__serial_number = getDeviceId();
+					break;
+				}
+			}
+		} catch(e) {
+			console.error(e);
+		}
+	}
+	return __serial_number || getDeviceId();
 }
 
 async function main() {
-	id = id || (await readDevice()).serialNumber || '';
-	cert = cert || (await readDevice()).deviceId || 'None';
+	id = id || getSerialNumber() || '';
+	cert = cert || getDeviceId() || 'None';
 
 	def_opts(['help'],      0,                 '--help         print help info');
 	def_opts(['id'],        id,                '--id, -id      device id [{0}]');
