@@ -24,7 +24,11 @@ const PRIVATE_KEY_FILE = `${process.env.HOME}/.dtty/privateKey`;
 /**
  * @class MySigner
  */
-class MySigner extends Signer {
+class MySigner {
+
+	constructor(options) {
+		this.options = options;
+	}
 
 	sign(url) {
 		var role = 'admin';
