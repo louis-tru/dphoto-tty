@@ -38,10 +38,11 @@ class Task {
 				this.host.that(this.sender).trigger('End', e.data).catch(console.error);
 			this.end();
 			this.host.m_tasks.delete(this.id);
-			this.host.removeEventListener(`Logout-${this.sender}`, this.id);
-			this.host.removeEventListener(`Offline`, this.id);
-			this.host.conv.onOverflow.off(this.id);
-			this.host.conv.onDrain.off(this.id);
+			var id = String(this.id);
+			this.host.removeEventListener(`Logout-${this.sender}`, id);
+			this.host.removeEventListener(`Offline`, id);
+			this.host.conv.onOverflow.off(id);
+			this.host.conv.onDrain.off(id);
 			console.log('task disconnect', this.sender);
 		}
 	}
