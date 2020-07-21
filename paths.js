@@ -3,8 +3,8 @@
  * @date 2018-11-05
  */
 
-var utils = require('nxkit').default;
-var fs = require('nxkit/fs');
+var utils = require('somes').default;
+var fs = require('somes/fs');
 var dphoto_tty = utils.config.temp || '/mnt/dphotos/dphoto-tty';
 var variable = dphoto_tty + '/var';
 

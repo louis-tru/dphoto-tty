@@ -3,21 +3,21 @@
  * @date 2018-11-05
  */
 
-var utils = require('nxkit').default;
+var utils = require('somes').default;
 var log = require('./log');
 var readline = require('readline');
 var crypto = require('crypto');
-var cli = require('nxkit/fmt/cli');
-var uuid = require('nxkit/hash/uuid').default;
+var cli = require('somes/fmt/cli');
+var uuid = require('somes/hash/uuid').default;
 var net = require('net');
 var errno = require('./errno');
 var crypto = require('crypto-tx');
-var fs = require('nxkit/fs');
-var keys = require('nxkit/keys').default;
+var fs = require('somes/fs');
+var keys = require('somes/keys').default;
 var path = require('path');
-var {Signer} = require('nxkit/request');
+var {Signer} = require('somes/request');
 
-require('nxkit/ws/conv').USE_GZIP_DATA = true;
+require('somes/ws/conv').USE_GZIP_DATA = true;
 
 const PRIVATE_KEY_FILE = `${process.env.HOME}/.dtty/privateKey`;
 

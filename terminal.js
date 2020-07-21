@@ -3,11 +3,11 @@
  * @date 2019-11-127
  */
 
-var utils = require('nxkit').default;
+var utils = require('somes').default;
 var pty = require('ptyjs2');
 var log = require('./log');
-var {Notification} = require('nxkit/event');
-var { exec } = require('nxkit/syscall');
+var {Notification} = require('somes/event');
+var { exec } = require('somes/syscall');
 
 /**
  * @class Terminal

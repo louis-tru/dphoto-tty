@@ -4,10 +4,10 @@
  * @date 2018-11-05
  */
 
-var utils = require('nxkit').default;
-var arguments = require('nxkit/arguments');
+var utils = require('somes').default;
+var arguments = require('somes/arguments');
 var { TTYServer } = require('./server');
-var { execSync } = require('nxkit/syscall');
+var { execSync } = require('somes/syscall');
 var paths = require('./paths');
 var { host = '127.0.0.1', port = 8096, id, cert } = utils.config.dttyd || {};
 var errno = require('./errno');

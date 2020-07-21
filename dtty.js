@@ -4,7 +4,7 @@
  * @date 2018-11-05
  */
 
-var arguments = require('nxkit/arguments');
+var arguments = require('somes/arguments');
 var { Command } = require('./client');
 
 var opts = arguments.options;

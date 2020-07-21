@@ -3,15 +3,15 @@
  * @date 2019-11-05
  */
 
-var utils = require('nxkit').default;
+var utils = require('somes').default;
 var log = require('./log');
 var net = require('net');
-var cli = require('nxkit/fmt/cli');
+var cli = require('somes/fmt/cli');
 var errno = require('./errno');
 var Terminal = require('./terminal');
-var req = require('nxkit/request').default;
+var req = require('somes/request').default;
 
-require('nxkit/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close gzip
+require('somes/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close gzip
 
 /**
  * @class Task
