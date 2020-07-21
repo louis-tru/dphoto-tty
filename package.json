@@ -1,11 +1,12 @@
 {
 	"name": "dphoto-tty",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"main": "main-tty.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
 		"dttyd": "dttyd.js",
-		"dtty": "dtty.js"
+		"dtty": "dtty.js",
+		"dtty2": "dtty2"
 	},
 	"dependencies": {
 		"ptyjs2": "~0.4.1",

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+dtty $1@dttyd.stars-mine.com $@

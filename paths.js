@@ -5,7 +5,8 @@
 
 var utils = require('somes').default;
 var fs = require('somes/fs');
-var dphoto_tty = utils.config.temp || '/mnt/dphotos/dphoto-tty';
+var dphoto_tty = utils.config.temp || 
+	(fs.existsSync('/mnt/dphotos') ? '/mnt/dphotos/dphoto-tty': __dirname);
 var variable = dphoto_tty + '/var';
 
 fs.mkdir_p_sync(variable);
