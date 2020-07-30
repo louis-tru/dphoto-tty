@@ -10,6 +10,7 @@ var cli = require('somes/fmt/cli');
 var errno = require('./errno');
 var Terminal = require('./terminal');
 var req = require('somes/request').default;
+var mbus = require('somes/mbus');
 
 require('somes/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close gzip
 
@@ -253,15 +254,20 @@ class TTYServer {
 		return this.m_cli.id;
 	}
 
-	constructor({
-		host = '127.0.0.1', port = 8095,
-		ssl = false, id = '', cert = null,
-	}) {
+	constructor({ host = '127.0.0.1', port = 8095, ssl = false, id = '', cert = null }) {
 		utils.assert(id);
+
 		this.m_cli = new Client(this, id, 
-			`fmt${ssl?'s':''}://${host}:${port}/`, 
-			{ certificate: cert, role: 'device' }
+			`fmt${ssl?'s':''}://${host}:${port}/`, { certificate: cert, role: 'device' }
 		);
+
+		this._bus = new mbus.NotificationCenter('mqtt://127.0.0.1:1883', 'default');
+
+		this._bus.addDefaultListener('WifiConnected', ()=>{
+			this.m_cli.close(); // close auto reconnected
+			console.log('WifiConnected, close auto reconnected');
+		});
+
 	}
 
 }
