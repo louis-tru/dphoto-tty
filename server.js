@@ -263,7 +263,7 @@ class TTYServer {
 
 		this._bus = new mbus.NotificationCenter('mqtt://127.0.0.1:1883', 'default');
 
-		this._bus.addDefaultListener('WifiConnected', ()=>{
+		this._bus.addEventListener('WifiConnected', ()=>{
 			this.m_cli.close(); // close auto reconnected
 			console.log('WifiConnected, close auto reconnected');
 		});

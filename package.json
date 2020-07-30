@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"ptyjs2": "~0.4.1",
-		"crypto-tx": "~0.2.9"
+		"crypto-tx": "~0.2.9",
+		"somes": "~0.10.79"
 	}
 }
