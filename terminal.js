@@ -4,7 +4,7 @@
  */
 
 var utils = require('somes').default;
-var pty = require('ptyjs2');
+var pty = require('pty.node');
 var log = require('./log');
 var {Notification} = require('somes/event');
 var { exec } = require('somes/syscall');
