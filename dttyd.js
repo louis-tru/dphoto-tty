@@ -30,7 +30,7 @@ function getDeviceId() {
 		if (!__device_id) {
 			if (fs.existsSync(paths.var + '/device_id')) {
 				__device_id = fs.readFileSync(paths.var + '/device_id', 'utf-8').trim();
-			} if (fs.existsSync('/mnt/dphotos/dphoto-hw/var/device_id')) {
+			} else if (fs.existsSync('/mnt/dphotos/dphoto-hw/var/device_id')) {
 				__device_id = fs.readFileSync('/mnt/dphotos/dphoto-hw/var/device_id', 'utf-8').trim();
 			} else {
 				throw Error.new(errno.ERR_UNABLE_TO_READ_DEVICE_ID);
