@@ -1,6 +1,6 @@
 {
 	"name": "dphoto-tty",
-	"version": "1.1.6",
+	"version": "1.1.7",
 	"main": "index.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
@@ -11,6 +11,6 @@
 	"dependencies": {
 		"pty.node": "~0.4.2",
 		"crypto-tx": "~0.2.9",
-		"somes": "~0.10.85"
+		"somes": "~0.10.86"
 	}
 }
