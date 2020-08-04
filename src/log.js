@@ -9,6 +9,7 @@ var log = require('somes/log');
 process.on('uncaughtException', function(err) {
 	console.error(err);
 });
+
 process.on('unhandledRejection', (err, promise) => {
 	console.error(err);
 });

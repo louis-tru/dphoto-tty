@@ -6,11 +6,11 @@
 
 var utils = require('somes').default;
 var arguments = require('somes/arguments');
-var { TTYServer } = require('./server');
+var { TTYServer } = require('../src/server');
 var { execSync } = require('somes/syscall');
-var paths = require('./paths');
+var paths = require('../src/paths');
 var { host = '127.0.0.1', port = 8096, id, cert } = utils.config.dttyd || {};
-var errno = require('./errno');
+var errno = require('../src/errno');
 var fs = require('fs');
 
 var opts = arguments.options;

@@ -1,16 +1,16 @@
 {
 	"name": "dphoto-tty",
 	"version": "1.1.5",
-	"main": "main-tty.js",
+	"main": "index.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
-		"dttyd": "dttyd.js",
-		"dtty": "dtty.js",
-		"dtty2": "dtty2"
+		"dttyd": "bin/dttyd.js",
+		"dtty": "bin/dtty.js",
+		"dtty2": "bin/dtty2"
 	},
 	"dependencies": {
 		"pty.node": "~0.4.2",
 		"crypto-tx": "~0.2.9",
-		"somes": "~0.10.79"
+		"somes": "~0.10.85"
 	}
 }

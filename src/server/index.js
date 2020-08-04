@@ -4,10 +4,10 @@
  */
 
 var utils = require('somes').default;
-var log = require('./log');
+var log = require('../log');
 var net = require('net');
 var cli = require('somes/fmt/cli');
-var errno = require('./errno');
+var errno = require('../errno');
 var Terminal = require('./terminal');
 var req = require('somes/request').default;
 var mbus = require('somes/mbus');
