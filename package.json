@@ -4,9 +4,9 @@
 	"main": "index.js",
 	"author": "louistru@hotmail.com",
 	"bin": {
-		"dttyd": "bin/dttyd.js",
-		"dtty": "bin/dtty.js",
-		"dtty2": "bin/dtty2"
+		"dttyd": "src/dttyd.js",
+		"dtty": "src/dtty.js",
+		"dtty2": "src/dtty2"
 	},
 	"dependencies": {
 		"pty.node": "~0.4.2",

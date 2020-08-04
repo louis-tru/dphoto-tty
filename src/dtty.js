@@ -5,7 +5,7 @@
  */
 
 var arguments = require('somes/arguments');
-var { Command } = require('../src/client');
+var { Command } = require('./client');
 
 var opts = arguments.options;
 var help_info = arguments.helpInfo;
