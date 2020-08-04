@@ -3,78 +3,17 @@
  * @date 2019-11-05
  */
 
-var utils = require('somes').default;
-var log = require('../log');
-var net = require('net');
-var cli = require('somes/fmt/cli');
-var errno = require('../errno');
-var Terminal = require('./terminal');
-var req = require('somes/request').default;
-var mbus = require('somes/mbus');
+const utils = require('somes').default;
+const log = require('../log');
+const net = require('net');
+const cli = require('somes/fmt/cli');
+const errno = require('../errno');
+const Terminal = require('./terminal');
+const req = require('somes/request').default;
+const mbus = require('somes/mbus');
+const {TerminalTask,ForwardTask} = require('./task');
 
 require('somes/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close gzip
-
-/**
- * @class Task
- */
-class Task {
-
-	constructor(host, sender, instance) {
-		this.activity = true;
-		this.sender = sender;
-		this.id = utils.id;
-		this.instance = instance;
-		this.host = host;
-		host.addEventListener(`Logout-${sender}`, this.destroy, this, this.id);
-		host.addEventListener('Offline', this.destroy, this, this.id);
-		host.conv.onOverflow.on(this.overflow, this, this.id);
-		host.conv.onDrain.on(this.drain, this, this.id);
-		host.m_tasks.set(this.id, this);
-	}
-
-	destroy(e, trigger) {
-		if (this.activity) {
-			this.activity = false;
-			if (trigger)
-				this.host.that(this.sender).trigger('End', e.data).catch(console.error);
-			this.end();
-			this.host.m_tasks.delete(this.id);
-			var id = String(this.id);
-			this.host.removeEventListener(`Logout-${this.sender}`, id);
-			this.host.removeEventListener(`Offline`, id);
-			this.host.conv.onOverflow.off(id);
-			this.host.conv.onDrain.off(id);
-			console.log('task disconnect', this.sender);
-		}
-	}
-
-	end() {}
-	overflow(){}
-	drain(){}
-}
-
-class TerminalTask extends Task {
-	end() {
-		this.instance.kill(0, 1);
-	}
-}
-
-class ForwardTask extends Task {
-	end() {
-		if (this.instance.writable)
-			this.instance.end();
-	}
-	overflow() {
-		if (utils.dev)
-			console.log('ForwardTask.overflow', this.id);
-		this.instance.pause();
-	}
-	drain(){
-		if (utils.dev)
-			console.log('ForwardTask.drain', this.id);
-		this.instance.resume();
-	}
-}
 
 /**
  * @class Client
