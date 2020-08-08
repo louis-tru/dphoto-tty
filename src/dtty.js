@@ -14,6 +14,7 @@ var def_opts = arguments.defOpts;
 def_opts(['help', 'h'],       0,   '--help, -h         print help info');
 def_opts(['ssl'],             0,   '--ssl              use ssl [{0}]');
 def_opts(['forward', 'f'],    0,   '--forward -f       forward remote port to local [{0}]');
+def_opts(['event', 'e'],      0,   '--event -e         forward remote port forward begin event [{0}]');
 def_opts(['test'],            '',  '--test             test fmt client [{0}]');
 def_opts(['port', 'p'],       0,   '--port -p          local port [{0}]');
 def_opts(['gen', 'G'],        0,   '--gen -G           gen key pair [{0}]');

@@ -35,7 +35,7 @@ module.exports = class Forward extends Client {
 	/**
 	 * @overwrite
 	 */
-	async _exec({ forward, port }) {
+	async _exec({ forward, port, event }) {
 		forward = Number(forward) || 0;
 		port = Number(port) || 0;
 		utils.assert(forward > 0 && forward < 65536);
@@ -58,7 +58,8 @@ module.exports = class Forward extends Client {
 		this.addEventListener(`Logout-${this.thatId}`, offline);
 		this.addEventListener('Offline', offline);
 
-		await that.call('forwardBegin', {port:forward});
+		if (event)
+			await that.call('forwardBegin', {port:forward});
 
 		// listener local port
 		var server = net.createServer(async socket=>{
