@@ -137,7 +137,7 @@ class Client extends cli.FMTClient {
 		return await new Promise((resolve, reject)=>{
 
 			var socket = net.createConnection({ port }, ()=>{
-				task = new ForwardTask(this, sender, socket);
+				task = new ForwardTask(this, sender, socket, port);
 				resolve(task.id);
 			});
 			socket.on('data', (data)=>{
@@ -201,6 +201,8 @@ class TTYServer {
 		);
 
 		this._bus = new mbus.NotificationCenter('mqtt://127.0.0.1:1883', 'default');
+
+		mbus.default.defaultNotificationCenter = this._bus;
 
 		this._bus.addEventListener('WifiConnected', ()=>{
 			this.m_cli.close(); // close auto reconnected

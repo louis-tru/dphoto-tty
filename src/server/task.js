@@ -4,6 +4,9 @@
  */
 
 const utils = require('somes').default;
+const mbus = require('somes/mbus');
+const paths = require('../paths');
+const fs = require('somes/fs');
 
 /**
  * @class Task
@@ -53,15 +56,30 @@ exports.TerminalTask = class TerminalTask extends Task {
 }
 
 exports.ForwardTask = class ForwardTask extends Task {
+
+	constructor(host, sender, instance, port) {
+		super(host, sender, instance);
+
+		this._port = port;
+
+		fs.writeFileSync(paths.var + '/' + this._port, '');
+
+		mbus.default.defaultNotificationCenter.publish('DTTYD_PORT_FORWARD', { port: this._port });
+	}
+
 	end() {
 		if (this.instance.writable)
 			this.instance.end();
+		fs.removerSync(paths.var + '/' + this._port, '');
+		mbus.default.defaultNotificationCenter.publish('DTTYD_PORT_FORWARD_END', { port: this._port });
 	}
+
 	overflow() {
 		if (utils.dev)
 			console.log('ForwardTask.overflow', this.id);
 		this.instance.pause();
 	}
+
 	drain(){
 		if (utils.dev)
 			console.log('ForwardTask.drain', this.id);
