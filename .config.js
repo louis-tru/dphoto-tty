@@ -8,5 +8,9 @@ module.exports = {
 		host: 'dttyd.stars-mine.com',
 		port: 8096,
 		id: '',
+		mbus: { 
+			url: 'mqtt://127.0.0.1:1883',
+			topic: 'default',
+		},
 	},
 };

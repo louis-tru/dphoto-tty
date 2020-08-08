@@ -19,18 +19,20 @@ class Task {
 		this.id = utils.id;
 		this.instance = instance;
 		this.host = host;
-		host.addEventListener(`Logout-${sender}`, this.destroy, this, this.id);
-		host.addEventListener('Offline', this.destroy, this, this.id);
-		host.conv.onOverflow.on(this.overflow, this, this.id);
-		host.conv.onDrain.on(this.drain, this, this.id);
-		host.m_tasks.set(this.id, this);
+		var id = String(utils.id);
+		this.host.addEventListener(`Logout-${sender}`, ()=>this.destroy(), id);
+		this.host.addEventListener('Offline', ()=>this.destroy(), id);
+		this.host.conv.onOverflow.on(()=>this.overflow(), id);
+		this.host.conv.onDrain.on(()=>this.drain(), id);
+		this.host.m_tasks.set(this.id, this);
+		this.begin();
 	}
 
-	destroy(e, trigger) {
+	destroy(trigger) {
 		if (this.activity) {
 			this.activity = false;
 			if (trigger)
-				this.host.that(this.sender).trigger('End', e.data).catch(console.error);
+				this.host.that(this.sender).trigger('End', this.id).catch(console.error);
 			this.end();
 			this.host.m_tasks.delete(this.id);
 			var id = String(this.id);
@@ -42,25 +44,33 @@ class Task {
 		}
 	}
 
+	begin() {}
 	end() {}
 	overflow(){}
 	drain(){}
 }
 
-exports.Task = Task;
-
-exports.TerminalTask = class TerminalTask extends Task {
+class TerminalTask extends Task {
 	end() {
 		this.instance.kill(0, 1);
 	}
 }
 
-exports.ForwardTask = class ForwardTask extends Task {
+class ForwardBeginTask extends Task {
 
-	constructor(host, sender, instance, port) {
-		super(host, sender, instance);
-		this._port = port;
+	begin() {
+		if (mbus.default.defaultNotificationCenter)
+			mbus.default.defaultNotificationCenter.publish('DTTYD_PORT_FORWARD', {port: this.instance});
 	}
+
+	end() {
+		if (mbus.default.defaultNotificationCenter)
+			mbus.default.defaultNotificationCenter.publish('DTTYD_PORT_FORWARD_END', {port: this.instance});
+	}
+
+}
+
+class ForwardTask extends Task {
 
 	end() {
 		if (this.instance.writable)
@@ -79,3 +89,8 @@ exports.ForwardTask = class ForwardTask extends Task {
 		this.instance.resume();
 	}
 }
+
+exports.Task = Task;
+exports.TerminalTask = TerminalTask;
+exports.ForwardBeginTask = ForwardBeginTask;
+exports.ForwardTask = ForwardTask;

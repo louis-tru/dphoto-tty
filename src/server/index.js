@@ -11,7 +11,7 @@ const errno = require('../errno');
 const Terminal = require('./terminal');
 const req = require('somes/request').default;
 const mbus = require('somes/mbus');
-const {TerminalTask,ForwardTask} = require('./task');
+const {TerminalTask,ForwardTask, ForwardBeginTask} = require('./task');
 
 require('somes/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close gzip
 
@@ -95,7 +95,7 @@ class Client extends cli.FMTClient {
 				// that.trigger('Data', e.data).catch(console.error);
 				that.send('d', [e.data]).catch(console.error);
 		});
-		task.instance.addEventListener('Exit', e=>task.destroy(e, true));
+		task.instance.addEventListener('Exit', ()=>task.destroy(true));
 
 		console.log('terminal connect', sender);
 
@@ -123,7 +123,12 @@ class Client extends cli.FMTClient {
 		this._task(tid, sender).instance.write(data);
 	}
 
-	// forward
+	/**
+	 * @func forwardBegin() forward port connect
+	 */
+	forwardBegin({port}, sender) {
+		new ForwardBeginTask(this, sender, port);
+	}
 
 	/**
 	 * @func forward() forward port connect
@@ -137,7 +142,7 @@ class Client extends cli.FMTClient {
 		return await new Promise((resolve, reject)=>{
 
 			var socket = net.createConnection({ port }, ()=>{
-				task = new ForwardTask(this, sender, socket, port);
+				task = new ForwardTask(this, sender, socket);
 				resolve(task.id);
 			});
 			socket.on('data', (data)=>{
@@ -146,7 +151,7 @@ class Client extends cli.FMTClient {
 			});
 			socket.on('end', ()=>{
 				console.log(`remote socket end, ${task.id}`);
-				task.destroy({data:task.id}, true)
+				task.destroy(true);
 			});
 			socket.on('error', e=>{
 				if (task) {
@@ -176,7 +181,7 @@ class Client extends cli.FMTClient {
 	fend([tid], sender) {
 		var task = this._taskNoErr(tid, sender);
 		if (task) {
-			this._task(tid, sender).destroy({data:tid});
+			this._task(tid, sender).destroy();
 		} else {
 			console.warn(`Useless fend, tid: ${tid}, sender: ${sender}`);
 		}
@@ -200,14 +205,18 @@ class TTYServer {
 			`fmt${ssl?'s':''}://${host}:${port}/`, { certificate: cert, role: 'device' }
 		);
 
-		this._bus = new mbus.NotificationCenter('mqtt://127.0.0.1:1883', 'default');
+		var mbus_cfg = utils.config.dttyd.mbus;
 
-		mbus.default.defaultNotificationCenter = this._bus;
+		if (mbus_cfg) {
+			this.m_bus = new mbus.NotificationCenter(mbus_cfg.url, mbus_cfg.topic);
 
-		this._bus.addEventListener('WifiConnected', ()=>{
-			this.m_cli.close(); // close auto reconnected
-			console.log('WifiConnected, close auto reconnected');
-		});
+			mbus.default.defaultNotificationCenter = this.m_bus;
+
+			this.m_bus.addEventListener('WifiConnected', ()=>{
+				this.m_cli.close(); // close auto reconnected
+				console.log('WifiConnected, close auto reconnected');
+			});
+		}
 
 	}
 
