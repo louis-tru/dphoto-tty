@@ -59,19 +59,12 @@ exports.ForwardTask = class ForwardTask extends Task {
 
 	constructor(host, sender, instance, port) {
 		super(host, sender, instance);
-
 		this._port = port;
-
-		fs.writeFileSync(paths.var + '/' + this._port, '');
-
-		mbus.default.defaultNotificationCenter.publish('DTTYD_PORT_FORWARD', { port: this._port });
 	}
 
 	end() {
 		if (this.instance.writable)
 			this.instance.end();
-		fs.removerSync(paths.var + '/' + this._port, '');
-		mbus.default.defaultNotificationCenter.publish('DTTYD_PORT_FORWARD_END', { port: this._port });
 	}
 
 	overflow() {
