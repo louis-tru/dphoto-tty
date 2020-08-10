@@ -25,6 +25,7 @@ class Client extends cli.FMTClient {
 		this.m_host = host;
 		this.m_tasks = new Map();
 		this._checkOffline().catch(console.error);;
+		this.conv.autoReconnect = 5e3; // 5s
 	}
 
 	async _checkOffline() {
@@ -214,6 +215,7 @@ class TTYServer {
 
 			this.m_bus.addEventListener('WifiConnected', ()=>{
 				this.m_cli.close(); // close auto reconnected
+				this.m_cli.conv.connect();
 				console.log('WifiConnected, close auto reconnected');
 			});
 		}
