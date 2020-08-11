@@ -11,6 +11,6 @@
 	"dependencies": {
 		"pty.node": "~0.4.2",
 		"crypto-tx": "~0.2.12",
-		"somes": "~0.10.96"
+		"somes": "~0.10.99"
 	}
 }
