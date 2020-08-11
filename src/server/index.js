@@ -25,7 +25,7 @@ class Client extends cli.FMTClient {
 		this.m_host = host;
 		this.m_tasks = new Map();
 		this._checkOffline().catch(console.error);;
-		this.conv.autoReconnect = 5e3; // 5s
+		// this.conv.autoReconnect = 5e3; // 5s
 	}
 
 	async _checkOffline() {
