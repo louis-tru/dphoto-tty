@@ -20,12 +20,12 @@ require('somes/ws/conv').USE_GZIP_DATA = false; // Reduce server pressure, close
  */
 class Client extends cli.FMTClient {
 
-	constructor(host, ...args) {
+	constructor(host, autoReconnect, ...args) {
 		super(...args);
 		this.m_host = host;
 		this.m_tasks = new Map();
 		this._checkOffline().catch(console.error);;
-		// this.conv.autoReconnect = 5e3; // 5s
+		this.conv.autoReconnect = autoReconnect; // 5s
 	}
 
 	async _checkOffline() {
@@ -199,10 +199,10 @@ class TTYServer {
 		return this.m_cli.id;
 	}
 
-	constructor({ host = '127.0.0.1', port = 8095, ssl = false, id = '', cert = null }) {
+	constructor({ host = '127.0.0.1', port = 8095, ssl = false, autoReconnect = 500, id = '', cert = null }) {
 		utils.assert(id);
 
-		this.m_cli = new Client(this, id, 
+		this.m_cli = new Client(this, autoReconnect, id, 
 			`fmt${ssl?'s':''}://${host}:${port}/`, { certificate: cert, role: 'device' }
 		);
 
