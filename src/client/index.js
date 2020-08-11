@@ -12,7 +12,7 @@ var fs = require('somes/fs');
 var keys = require('somes/keys').default;
 var path = require('path');
 
-require('somes/ws/conv').USE_GZIP_DATA = true;
+require('somes/ws/conv').USE_GZIP_DATA = false;
 
 const PRIVATE_KEY_FILE = `${process.env.HOME}/.dtty/privateKey`;
 
@@ -24,14 +24,15 @@ const Programs = {
 
 class Signer {
 
-	constructor(options) {
-		this.options = options;
+	constructor(user, privateKey) {
+		this.user = user;
+		this.privateKey = privateKey;
 	}
 
 	sign() {
 		var role = 'admin';
 		var st = Date.now();
-		var {user, privateKey} = this.options;
+		var {user, privateKey} = this;
 		var key = 'a4dd53f2fefde37c07ac4824cf7086439633e1a357daacc3aaa16418275a9e40';
 		var hash = Buffer.from(crypto.keccak(user + role + st + key).data);
 		var sign = crypto.sign(hash, privateKey);
@@ -58,7 +59,9 @@ class Command {
 	}
 
 	test(opts) {
-		this._run('test', opts).catch(console.error);
+		for (var i = 0; i < 500; i++) {
+			this._run('test', { index: i, ...opts }, true).catch(console.error);
+		}
 	}
 
 	async genkeyPair(opts) { // gen key pair
@@ -119,7 +122,7 @@ class Command {
 		});
 	}
 
-	async _run(cmd, options) {
+	async _run(cmd, options, noErr) {
 
 		try {
 			var privateKeys = keys.parseFile(PRIVATE_KEY_FILE);
@@ -141,10 +144,17 @@ class Command {
 		var { serverHost = '127.0.0.1', serverPort = 8096, ssl = false, thatId = '' } = options;
 		var url = `fmt${ssl?'s':''}://${serverHost}:${serverPort}`;
 		try {
-			this.m_cli = new (Programs[cmd])(url, thatId);
-			this.m_cli.conv.signer = new Signer({ user, privateKey });
-			await this.m_cli.getFullThatId();
-			await this.m_cli._exec(options);
+			var cli = new (Programs[cmd])(url, thatId);
+			cli.conv.signer = new Signer(user, privateKey);
+			do {
+				try {
+					await cli.getFullThatId();
+					break;
+				} catch(err) {
+					if (!noErr) throw err;
+				}
+			} while(true);
+			await cli._exec(options);
 		} catch(err) {
 			// throw err;
 			console.error('\n\nError: ' + err.message + `\n`/* + `Target device ${thatId} offline\n\n`*/);

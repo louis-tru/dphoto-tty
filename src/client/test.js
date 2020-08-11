@@ -10,12 +10,17 @@ var Client = require('./cli');
  * @class Test
  */
 module.exports = class Test extends Client {
-	async _exec({ test }) {
-		var that = this.that(test);
+	async _exec({ index }) {
+		var that = this.m_that;
 
 		while (true) {
-			console.log('test', test, await that.hasOnline());
-			await utils.sleep(5e3);
+			try {
+				console.log('test hasOnline', index, that.id, await that.hasOnline());
+				// console.log('test event', await that.trigger('test'));
+				await utils.sleep(utils.random(2e4, 5e4));
+			} catch(err) {
+				console.error(err);
+			}
 		}
 	}
 }
