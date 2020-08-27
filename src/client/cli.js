@@ -17,7 +17,7 @@ module.exports = class Client extends cli.FMTClient {
 	}
 
 	constructor(url, thatid) {
-		super(uuid(), url, { thatid });
+		super(utils.hash(uuid()), url, { thatid });
 		this.m_thatId = null;
 	}
 
