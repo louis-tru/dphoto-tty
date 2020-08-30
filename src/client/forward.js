@@ -58,8 +58,13 @@ module.exports = class Forward extends Client {
 		this.addEventListener(`Logout-${this.thatId}`, offline);
 		this.addEventListener('Offline', offline);
 
-		if (event)
-			await that.call('forwardBegin', {port:forward});
+		try {
+			if (event) {
+				await that.call('forwardBegin', {port:forward});
+			}
+		} catch(err) {
+			console.warn(err);
+		}
 
 		// listener local port
 		var server = net.createServer(async socket=>{
