@@ -5,9 +5,10 @@
 
 var utils = require('somes').default;
 var fs = require('somes/fs');
+var path = require('path');
 var dphoto_tty = utils.config.temp || 
-	(fs.existsSync('/mnt/dphotos') ? '/mnt/dphotos/dphoto-tty': __dirname);
-var variable = dphoto_tty + '/var';
+	(fs.existsSync('/mnt/dphotos') ? '/mnt/dphotos/dphoto-tty': `${__dirname}/..`);
+var variable = path.resolve(dphoto_tty + '/var');
 
 fs.mkdir_p_sync(variable);
 fs.writeFileSync(`${variable}/pid`, String(process.pid));
