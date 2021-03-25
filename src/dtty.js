@@ -4,6 +4,8 @@
  * @date 2018-11-05
  */
 
+process.chdir(__dirname + '/..');
+
 var arguments = require('somes/arguments');
 var { Command } = require('./client');
 

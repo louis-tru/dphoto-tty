@@ -7,7 +7,8 @@ module.exports = {
 	dttyd: {
 		host: 'dttyd.stars-mine.com',
 		port: 8096,
-		id: '',
+		id: '', // getSerialNumber
+		cert: '', // getDeviceId
 		autoReconnect: 500,
 		mbus: { 
 			url: 'mqtt://127.0.0.1:1883',
