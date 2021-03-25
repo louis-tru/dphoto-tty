@@ -128,7 +128,7 @@ class Command {
 			var privateKeys = keys.parseFile(PRIVATE_KEY_FILE);
 			var user, privateKey;
 			for (var user in privateKeys) {
-				privateKey = new Buffer(privateKeys[user], 'hex');
+				privateKey = Buffer.from(privateKeys[user], 'hex');
 				break;
 			}
 			if (!user)
