@@ -10,7 +10,7 @@ var dphoto_tty = utils.config.temp ||
 var variable = dphoto_tty + '/var';
 
 fs.mkdir_p_sync(variable);
-fs.writeFileSync(`${variable}/pid`, process.pid);
+fs.writeFileSync(`${variable}/pid`, String(process.pid));
 
 module.exports = {
 	var: variable,
