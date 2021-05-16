@@ -66,7 +66,7 @@ async function main() {
 	cert = cert || getDeviceId() || 'None';
 
 	def_opts(['help'],      0,                 '--help         print help info');
-	def_opts(['id'],        id,                '--id, -id      device id [{0}]');
+	def_opts(['id'],        id,                '--id, -id      device serial number [{0}]');
 	def_opts(['host', 'h'], host,              '--host, -h     host [{0}]');
 	def_opts(['port', 'p'], port,              '--port, -p     port [{0}]');
 	def_opts(['ssl'],       0,                 '--ssl          use ssl [{0}]');
