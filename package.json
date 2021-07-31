@@ -9,7 +9,7 @@
 		"dtty2": "src/dtty2"
 	},
 	"dependencies": {
-		"pty.node": "~0.4.2",
+		"pty.node": "~0.4.3",
 		"crypto-tx": "~0.2.12",
 		"somes": "~0.10.100"
 	}
