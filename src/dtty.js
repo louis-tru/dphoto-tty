@@ -7,6 +7,7 @@
 process.chdir(__dirname + '/..');
 
 var arguments = require('somes/arguments');
+var req = require('somes/request');
 var { Command } = require('./client');
 
 var opts = arguments.options;
@@ -21,12 +22,22 @@ def_opts(['test'],            '',  '--test             test fmt client [{0}]');
 def_opts(['port', 'p'],       0,   '--port -p          local port [{0}]');
 def_opts(['gen', 'G'],        0,   '--gen -G           gen key pair [{0}]');
 def_opts(['force', 'F'],      0,   '--force -F         force exec [{0}]');
+def_opts(['list', 'l'],       0,   '--list -l          show current clients');
+// http://dttyd.stars-mine.com:8096/service-api/api/onlineDevices
 
-function main() {
+async function main() {
 	var cmd = new Command();
 
 	if (opts.gen) {
 		return cmd.genkeyPair(opts);
+	}
+	
+	if (opts.list) {
+		console.log('list');
+		var buf = await req.default.get('http://dttyd.stars-mine.com:8096/service-api/api/onlineDevices');
+		var data = JSON.parse(buf.data + '');
+		console.log(data.data.data);
+		return;
 	}
 
 	var [ id, hosts ] = String(process.argv[2] || '').split('@');
