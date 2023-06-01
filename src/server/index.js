@@ -146,14 +146,17 @@ class Client extends cli.FMTClient {
 				task = new ForwardTask(this, sender, socket);
 				resolve(task.id);
 			});
+
 			socket.on('data', (data)=>{
 				if (task.activity)
 					that.send('d', [task.id,data]).catch(console.error);
 			});
+
 			socket.on('end', ()=>{
 				console.log(`remote socket end, ${task.id}`);
 				task.destroy(true);
 			});
+
 			socket.on('error', e=>{
 				if (task) {
 					that.send('err', [task.id,e]).catch(console.error);

@@ -12,8 +12,12 @@ var Client = require('./cli');
  */
 module.exports = class Forward extends Client {
 
-	_task(tid, sender) {
+	async _task(tid, sender) {
 		var task = this.m_tasks.get(tid);
+		if (!task) {
+			await utils.sleep(1e2);
+			task = this.m_tasks.get(tid);
+		}
 		if (task && this.thatId == sender) {
 			return task;
 		}
@@ -74,38 +78,42 @@ module.exports = class Forward extends Client {
 
 				task.id = await that.call('forward', {port:forward});
 
+				tasks.set(task.id, task);
+
 				socket.on('data', data=>{
 					if (task.activity)
 						that.send('fw', [task.id,data]).catch(console.error);
+					else
+						console.warn(`Useless socket data send, tid: ${tid}, target: ${that.id}, data length: ${data.length}`);
 				});
 
 				socket.on('end', ()=>{
-					console.log(`local socket end, ${task.id}`);
+					console.log(`local socket end, tid: ${task.id}`);
 					this._end(task);
 				});
 
 				socket.on('error', e=>{
-					console.error(`local socket error, ${task.id}`, e);
+					console.error(`local socket error, tid: ${task.id}`, e);
 					this._end(task);
 				});
 
 				this.conv.onOverflow.on(()=>{
 					if (utils.dev)
-						console.log('Forward.onOverflow', task.id);
+						console.log('Forward.onOverflow tid:', task.id);
 					socket.pause();
 				}, task.id);
 
 				this.conv.onDrain.on(()=>{
 					if (utils.dev)
-						console.log('Forward.onDrain', task.id);
+						console.log('Forward.onDrain tid:', task.id);
 					socket.resume();
 				}, task.id);
 
 				socket.resume();
+
 			} catch(err) {
 				socket.end();
 			}
-			tasks.set(task.id, task);
 		});
 
 		server.on('error', (err) => {
@@ -132,7 +140,7 @@ module.exports = class Forward extends Client {
 	err([tid,data], sender) {
 		var task = this._task(tid, sender);
 		if (task) {
-			console.error(`remote socket error, ${task.id}`, data);
+			console.error(`remote socket error, tid: ${task.id}`, data);
 			// this._end(task);
 		} else {
 			console.warn(`Useless socket err data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
