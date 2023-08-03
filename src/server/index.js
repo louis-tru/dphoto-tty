@@ -145,6 +145,7 @@ class Client extends cli.FMTClient {
 			var socket = net.createConnection({ port }, ()=>{
 				task = new ForwardTask(this, sender, socket);
 				resolve(task.id);
+				socket.resume();
 				console.log(`forward connect ok ${sender} ${task.id}`);
 			});
 
@@ -167,6 +168,8 @@ class Client extends cli.FMTClient {
 					reject(e);
 				}
 			});
+
+			socket.pause();
 
 			console.log('forward connect', sender);
 		});

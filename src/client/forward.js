@@ -13,10 +13,17 @@ var Client = require('./cli');
 module.exports = class Forward extends Client {
 
 	_task(tid, sender) {
-		var task = this.m_tasks.get(tid);
-		if (task && this.thatId == sender) {
-			return task;
-		}
+		return utils.scopeLock(this, async()=>{
+			var task = this.m_tasks.get(tid);
+			var retry = 5;
+			while (!task && --retry) {
+				await utils.sleep(1e2); // 100ms
+				task = this.m_tasks.get(tid);
+			}
+			if (task && this.thatId == sender) {
+				return task;
+			}
+		});
 	}
 
 	_end(task, sendFend) {
@@ -74,7 +81,7 @@ module.exports = class Forward extends Client {
 				task.id = await that.call('forward', {port:forward});
 				tasks.set(task.id, task);
 				socket.resume();
-				socket.setNoDelay(true);
+				// socket.setNoDelay(true);
 
 				socket.on('data', data=>{
 					//console.log('data', task.id, data + '');
@@ -123,9 +130,9 @@ module.exports = class Forward extends Client {
 	/**
 	 * @func d()
 	 */
-	d([tid,data], sender) {
+	async d([tid,data], sender) {
 		// console.log('d', tid, data.length, data + '');
-		var task = this._task(tid, sender);
+		var task = await this._task(tid, sender);
 		if (task) {
 			task.instance.write(data);
 		} else {
@@ -133,9 +140,9 @@ module.exports = class Forward extends Client {
 		}
 	}
 
-	end([tid], sender) {
+	async end([tid], sender) {
 		//console.log('end', tid, sender);
-		var task = this._task(tid, sender);
+		var task = await this._task(tid, sender);
 		if (task) {
 			this._end(task);
 		} else {
@@ -143,8 +150,8 @@ module.exports = class Forward extends Client {
 		}
 	}
 
-	err([tid,data], sender) {
-		var task = this._task(tid, sender);
+	async err([tid,data], sender) {
+		var task = await this._task(tid, sender);
 		if (task) {
 			console.error(`remote socket error, tid: ${task.id}`, data);
 			// this._end(task);
