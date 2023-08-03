@@ -149,12 +149,13 @@ class Client extends cli.FMTClient {
 			});
 
 			socket.on('data', (data)=>{
+				console.log(`remote socket data, ${task.activity} ${sender} ${task.id} ${data.length}`);
 				if (task.activity)
 					that.send('d', [task.id,data]).catch(console.error);
 			});
 
 			socket.on('end', ()=>{
-				console.log(`remote socket end, ${sender} ${task.id} ${task.activity}`);
+				console.log(`remote socket end, ${task.activity} ${sender} ${task.id}`);
 				if (task.activity)
 					that.send('end', [task.id]).catch(console.error);
 				task.destroy(true);
