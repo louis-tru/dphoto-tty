@@ -123,7 +123,7 @@ module.exports = class Forward extends Client {
 		});
 
 		server.listen(port, ()=>{
-			console.log(`remote device port forward, remote ${forward} to local ${port}`);
+			console.log(`remote device port forward, remote ${host}:${forward} to local :${port}`);
 		});
 	}
 
