@@ -140,6 +140,7 @@ module.exports = class Forward extends Client {
 	}
 
 	end([tid], sender) {
+		console.log('end', tid);
 		var task = this._task(tid, sender);
 		if (task) {
 			this._task(tid, sender).instance.end();
