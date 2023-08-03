@@ -23,7 +23,7 @@ def_opts(['port', 'p'],       0,   '--port -p          local port [{0}]');
 def_opts(['gen', 'G'],        0,   '--gen -G           gen key pair [{0}]');
 def_opts(['force', 'F'],      0,   '--force -F         force exec [{0}]');
 def_opts(['list', 'l'],       0,   '--list -l          show current clients');
-def_opts(['host'],            '',  '--host             hostname for forward remote port [{0}]');
+def_opts(['host'],  '127.0.0.1',   '--host             hostname for forward remote port default {0}');
 // http://dttyd.stars-mine.com:8096/service-api/api/onlineDevices
 
 async function main() {
