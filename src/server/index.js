@@ -134,7 +134,7 @@ class Client extends cli.FMTClient {
 	/**
 	 * @func forward() forward port connect
 	 */
-	async forward({port, tid}, sender) {
+	async forward({host, port, tid}, sender) {
 		utils.assert(sender);
 		var senderInfo = await this.user(sender);
 		utils.assert(senderInfo.role == 'admin', errno.ERR_NOT_PERMISSION);
@@ -145,7 +145,7 @@ class Client extends cli.FMTClient {
 
 		return await new Promise((resolve, reject)=>{
 
-			var socket = net.createConnection({ port }, ()=>{
+			var socket = net.createConnection({ host, port }, ()=>{
 				task = new ForwardTask(this, sender, socket, tid);
 				resolve(task.id);
 				socket.resume();

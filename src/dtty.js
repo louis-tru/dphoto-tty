@@ -14,7 +14,7 @@ var opts = arguments.options;
 var help_info = arguments.helpInfo;
 var def_opts = arguments.defOpts;
 
-def_opts(['help', 'h'],       0,   '--help, -h         print help info');
+def_opts(['help'],            0,   '--help, -h         print help info');
 def_opts(['ssl'],             0,   '--ssl              use ssl [{0}]');
 def_opts(['forward', 'f'],    0,   '--forward -f       forward remote port to local [{0}]');
 def_opts(['event', 'e'],      1,   '--event -e         forward remote port forward begin event [{0}]');
@@ -23,6 +23,7 @@ def_opts(['port', 'p'],       0,   '--port -p          local port [{0}]');
 def_opts(['gen', 'G'],        0,   '--gen -G           gen key pair [{0}]');
 def_opts(['force', 'F'],      0,   '--force -F         force exec [{0}]');
 def_opts(['list', 'l'],       0,   '--list -l          show current clients');
+def_opts(['host', 'h'],       '',  '--host -h          forward remote host to local [{0}]');
 // http://dttyd.stars-mine.com:8096/service-api/api/onlineDevices
 
 async function main() {

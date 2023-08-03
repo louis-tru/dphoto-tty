@@ -42,7 +42,7 @@ module.exports = class Forward extends Client {
 	/**
 	 * @overwrite
 	 */
-	async _exec({ forward, port, event }) {
+	async _exec({ host, forward, port, event }) {
 		forward = Number(forward) || 0;
 		port = Number(port) || 0;
 		utils.assert(forward > 0 && forward < 65536);
@@ -78,7 +78,7 @@ module.exports = class Forward extends Client {
 			var task = {instance: socket, activity: true};
 			try {
 				socket.pause();
-				task.id = await that.call('forward', {port:forward});
+				task.id = await that.call('forward', {host,port:forward});
 				tasks.set(task.id, task);
 				socket.resume();
 				// socket.setNoDelay(true);
