@@ -12,18 +12,20 @@ var Client = require('./cli');
  */
 module.exports = class Forward extends Client {
 
-	_task(tid, sender) {
-		return utils.scopeLock(this, async()=>{
-			var task = this.m_tasks.get(tid);
-			var retry = 5;
-			while (!task && --retry) {
-				await utils.sleep(1e2); // 100ms
-				task = this.m_tasks.get(tid);
-			}
-			if (task && this.thatId == sender) {
-				return task;
-			}
-		});
+	async _task(tid, sender) {
+		var task = this.m_tasks.get(tid);
+		if (!task) {
+			await utils.scopeLock(this, async()=>{
+				var retry = 5;
+				do {
+					await utils.sleep(10); // 10ms
+					task = this.m_tasks.get(tid);
+				} while (!task && --retry);
+			});
+		}
+		if (task && this.thatId == sender) {
+			return task;
+		}
 	}
 
 	_end(task, sendFend) {

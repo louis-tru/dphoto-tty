@@ -13,13 +13,13 @@ const fs = require('somes/fs');
  */
 class Task {
 
-	constructor(host, sender, instance) {
+	constructor(host, sender, instance, tid) {
+		var id = tid || utils.getId();
+		this.id = id;
 		this.activity = true;
 		this.sender = sender;
-		this.id = utils.id;
 		this.instance = instance;
 		this.host = host;
-		var id = String(utils.id);
 		this.host.addEventListener(`Logout-${sender}`, ()=>this.destroy(), id);
 		this.host.addEventListener('Offline', ()=>this.destroy(), id);
 		this.host.conv.onOverflow.on(()=>this.overflow(), id);
@@ -30,12 +30,12 @@ class Task {
 
 	destroy(triggerEnd) {
 		if (this.activity) {
+			var id = this.id;
 			this.activity = false;
 			if (triggerEnd)
-				this.host.that(this.sender).trigger('End', this.id).catch(console.error);
+				this.host.that(this.sender).trigger('End', id).catch(console.error);
 			this.end();
-			this.host.m_tasks.delete(this.id);
-			var id = String(this.id);
+			this.host.m_tasks.delete(id);
 			this.host.removeEventListener(`Logout-${this.sender}`, id);
 			this.host.removeEventListener(`Offline`, id);
 			this.host.conv.onOverflow.off(id);

@@ -134,16 +134,19 @@ class Client extends cli.FMTClient {
 	/**
 	 * @func forward() forward port connect
 	 */
-	async forward({port}, sender) {
+	async forward({port, tid}, sender) {
 		utils.assert(sender);
 		var senderInfo = await this.user(sender);
 		utils.assert(senderInfo.role == 'admin', errno.ERR_NOT_PERMISSION);
 		var that = this.that(sender), task;
+		if (tid) {
+			utils.assert(!this.m_tasks.has(tid), errno.ERR_REPEAT_TASK_ID);
+		}
 
 		return await new Promise((resolve, reject)=>{
 
 			var socket = net.createConnection({ port }, ()=>{
-				task = new ForwardTask(this, sender, socket);
+				task = new ForwardTask(this, sender, socket, tid);
 				resolve(task.id);
 				socket.resume();
 				console.log(`forward connect ok ${sender} ${task.id}`);
