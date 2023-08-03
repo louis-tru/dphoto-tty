@@ -28,10 +28,10 @@ class Task {
 		this.begin();
 	}
 
-	destroy(trigger) {
+	destroy(triggerEnd) {
 		if (this.activity) {
 			this.activity = false;
-			if (trigger)
+			if (triggerEnd)
 				this.host.that(this.sender).trigger('End', this.id).catch(console.error);
 			this.end();
 			this.host.m_tasks.delete(this.id);

@@ -23,10 +23,10 @@ module.exports = class Forward extends Client {
 		}
 	}
 
-	_end(task, noSend) {
+	_end(task, sendFend) {
 		if (task && task.activity) {
 			task.activity = false;
-			if (!noSend)
+			if (sendFend)
 			this.m_that.send('fend', [task.id]).catch(console.error);
 			if (task.instance.writable)
 				task.instance.end();
@@ -58,7 +58,7 @@ module.exports = class Forward extends Client {
 			tasks.clear();
 		};
 
-		this.addEventListener('End', e=>this._end(this._task(e.data, e.origin), true));
+		this.addEventListener('End', e=>this.end([e.data], e.origin));
 		this.addEventListener(`Logout-${this.thatId}`, offline);
 		this.addEventListener('Offline', offline);
 
@@ -90,12 +90,12 @@ module.exports = class Forward extends Client {
 
 				socket.on('end', ()=>{
 					console.log(`local socket end, tid: ${task.id}`);
-					this._end(task);
+					this._end(task, true);
 				});
 
 				socket.on('error', e=>{
 					console.error(`local socket error, tid: ${task.id}`, e);
-					this._end(task);
+					this._end(task, true);
 				});
 
 				this.conv.onOverflow.on(()=>{
@@ -130,7 +130,7 @@ module.exports = class Forward extends Client {
 	 * @func d()
 	 */
 	d([tid,data], sender) {
-		console.log('d', tid, data + '');
+		console.log('d', tid, data.length, data + '');
 		var task = this._task(tid, sender);
 		if (task) {
 			this._task(tid, sender).instance.write(data);
@@ -140,10 +140,10 @@ module.exports = class Forward extends Client {
 	}
 
 	end([tid], sender) {
-		console.log('end', tid);
+		console.log('end', tid, sender);
 		var task = this._task(tid, sender);
 		if (task) {
-			this._task(tid, sender).instance.end();
+			this._end(task);
 		} else {
 			console.warn(`Useless socket end, tid: ${tid}, sender: ${sender}`);
 		}
