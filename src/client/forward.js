@@ -81,6 +81,7 @@ module.exports = class Forward extends Client {
 				tasks.set(task.id, task);
 
 				socket.on('data', data=>{
+					console.log('data', task.id);
 					if (task.activity)
 						that.send('fw', [task.id,data]).catch(console.error);
 					else
@@ -129,11 +130,21 @@ module.exports = class Forward extends Client {
 	 * @func d()
 	 */
 	d([tid,data], sender) {
+		console.log('d', tid, data + '');
 		var task = this._task(tid, sender);
 		if (task) {
 			this._task(tid, sender).instance.write(data);
 		} else {
 			console.warn(`Useless socket data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
+		}
+	}
+
+	end([tid], sender) {
+		var task = this._task(tid, sender);
+		if (task) {
+			this._task(tid, sender).instance.end();
+		} else {
+			console.warn(`Useless socket end, tid: ${tid}, sender: ${sender}`);
 		}
 	}
 
