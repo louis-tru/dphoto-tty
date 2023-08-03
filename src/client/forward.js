@@ -12,12 +12,8 @@ var Client = require('./cli');
  */
 module.exports = class Forward extends Client {
 
-	async _task(tid, sender) {
+	_task(tid, sender) {
 		var task = this.m_tasks.get(tid);
-		if (!task) {
-			await utils.sleep(1e2);
-			task = this.m_tasks.get(tid);
-		}
 		if (task && this.thatId == sender) {
 			return task;
 		}
@@ -75,13 +71,13 @@ module.exports = class Forward extends Client {
 			var task = {instance: socket, activity: true};
 			try {
 				socket.pause();
-
 				task.id = await that.call('forward', {port:forward});
-
 				tasks.set(task.id, task);
+				socket.resume();
+				socket.setNoDelay(true);
 
 				socket.on('data', data=>{
-					console.log('data', task.id);
+					//console.log('data', task.id, data + '');
 					if (task.activity)
 						that.send('fw', [task.id,data]).catch(console.error);
 					else
@@ -95,7 +91,7 @@ module.exports = class Forward extends Client {
 
 				socket.on('error', e=>{
 					console.error(`local socket error, tid: ${task.id}`, e);
-					this._end(task, true);
+					// this._end(task, true);
 				});
 
 				this.conv.onOverflow.on(()=>{
@@ -109,8 +105,6 @@ module.exports = class Forward extends Client {
 						console.log('Forward.onDrain tid:', task.id);
 					socket.resume();
 				}, task.id);
-
-				socket.resume();
 
 			} catch(err) {
 				socket.end();
@@ -130,17 +124,17 @@ module.exports = class Forward extends Client {
 	 * @func d()
 	 */
 	d([tid,data], sender) {
-		console.log('d', tid, data.length, data + '');
+		// console.log('d', tid, data.length, data + '');
 		var task = this._task(tid, sender);
 		if (task) {
-			this._task(tid, sender).instance.write(data);
+			task.instance.write(data);
 		} else {
 			console.warn(`Useless socket data, tid: ${tid}, sender: ${sender}, data length: ${data.length}`);
 		}
 	}
 
 	end([tid], sender) {
-		console.log('end', tid, sender);
+		//console.log('end', tid, sender);
 		var task = this._task(tid, sender);
 		if (task) {
 			this._end(task);
