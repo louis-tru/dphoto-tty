@@ -14,8 +14,8 @@ const fs = require('somes/fs');
 class Task {
 
 	constructor(host, sender, instance, tid) {
-		var id = tid || utils.getId();
-		this.id = id;
+		this.id = tid || utils.getId();
+		var id = String(this.id);
 		this.activity = true;
 		this.sender = sender;
 		this.instance = instance;
@@ -30,7 +30,7 @@ class Task {
 
 	destroy(triggerEnd) {
 		if (this.activity) {
-			var id = this.id;
+			var id = String(this.id);
 			this.activity = false;
 			if (triggerEnd)
 				this.host.that(this.sender).trigger('End', id).catch(console.error);

@@ -105,13 +105,13 @@ module.exports = class Forward extends Client {
 					if (utils.dev)
 						console.log('Forward.onOverflow tid:', task.id);
 					socket.pause();
-				}, task.id);
+				}, String(task.id));
 
 				this.conv.onDrain.on(()=>{
 					if (utils.dev)
 						console.log('Forward.onDrain tid:', task.id);
 					socket.resume();
-				}, task.id);
+				}, String(task.id));
 
 			} catch(err) {
 				socket.end();
